@@ -9,7 +9,7 @@ Supervisor: Dr. Bhupinder Singh
 Affiliation: School of Computer Science & Engineering, Lovely Professional University, Phagwara, India
 
 Outputs:
-1. IEEE_Final_Project_Report.docx (Strict IEEE Two-Column Conference Format)
+1. IEEE_Final_Project_Report.docx (Strict IEEE Two-Column Conference Format, Human-Academic Tone)
 2. EduCluster_ML_Presentation.pptx (10-Slide Dark-Navy Widescreen Defense Deck)
 """
 
@@ -191,13 +191,11 @@ def generate_figures():
     fig, ax = plt.subplots(figsize=(6.8, 4.4), dpi=300)
     im = ax.imshow(matrix, cmap='Blues', aspect='auto')
     
-    # Set tick labels
     ax.set_xticks(np.arange(len(col_labels)))
     ax.set_yticks(np.arange(len(row_labels)))
     ax.set_xticklabels(col_labels, fontsize=8, fontweight='bold', family='sans-serif')
     ax.set_yticklabels(row_labels, fontsize=8, fontweight='bold', family='sans-serif')
     
-    # Annotate values
     for i in range(len(row_labels)):
         for j in range(len(col_labels)):
             val = matrix[i, j]
@@ -219,7 +217,7 @@ def generate_figures():
 
 
 # ==============================================================================
-# 2. IEEE FINAL PROJECT REPORT (DOCX GENERATOR)
+# 2. IEEE FINAL PROJECT REPORT (DOCX GENERATOR - HUMAN-ACADEMIC STYLE)
 # ==============================================================================
 def set_cell_margins(cell, top=60, bottom=60, left=80, right=80):
     """Set cell padding in twips (dxa)."""
@@ -309,7 +307,7 @@ def format_table_cells(table, align_cols=None):
                     run.font.size = Pt(8)
 
 def generate_docx():
-    print("[2/3] Generating IEEE_Final_Project_Report.docx (IEEE Two-Column Format)...")
+    print("[2/3] Generating IEEE_Final_Project_Report.docx (Humanized IEEE Format)...")
     
     doc = docx.Document()
     
@@ -324,7 +322,7 @@ def generate_docx():
     sec0.left_margin = Inches(0.625)
     sec0.right_margin = Inches(0.625)
     
-    # Ensure section 0 is explicitly 1 column
+    # Ensure section 0 is explicitly single-column
     sectPr0 = sec0._sectPr
     cols0 = sectPr0.find(qn('w:cols'))
     if cols0 is None:
@@ -332,7 +330,7 @@ def generate_docx():
         sectPr0.append(cols0)
     cols0.set(qn('w:num'), '1')
     
-    # Paper Title (20pt Bold Centered)
+    # Paper Title (18pt Bold Centered)
     p_title = doc.add_paragraph()
     p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_title.paragraph_format.space_before = Pt(0)
@@ -417,7 +415,6 @@ def generate_docx():
     cols1.set(qn('w:num'), '2')
     cols1.set(qn('w:space'), '360')
     
-    # Helper for body paragraphs
     def add_body_p(text, bold_prefix=None, space_after=4):
         p = doc.add_paragraph()
         p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
@@ -486,28 +483,29 @@ def generate_docx():
         return p_cap
 
     # ----------------------------------------------------
-    # Abstract & Index Terms
+    # Abstract & Index Terms (Humanized, No em dashes)
     # ----------------------------------------------------
     p_abs = doc.add_paragraph()
     p_abs.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     p_abs.paragraph_format.space_before = Pt(0)
     p_abs.paragraph_format.space_after = Pt(4)
     p_abs.paragraph_format.line_spacing = 1.05
-    r_abs_lbl = p_abs.add_run("Abstract—")
+    r_abs_lbl = p_abs.add_run("Abstract: ")
     r_abs_lbl.font.name = 'Times New Roman'; r_abs_lbl.font.size = Pt(9.0); r_abs_lbl.font.bold = True; r_abs_lbl.font.italic = True
     r_abs_txt = p_abs.add_run(
-        "Digital learning management systems (LMS) enforce rigid, uniform schedules that neglect wide variations in student engagement habits. "
-        "At the same time, traditional retention systems rely on mid-semester exam grades, by which point disengaged students have often accumulated "
-        "irreversible conceptual deficits. In this work, we present EduCluster ML, an unsupervised learning pipeline designed to segment students and "
-        "generate customized four-week learning interventions from clickstream data. Using the Open University Learning Analytics Dataset (OULAD) across "
-        "N = 14,003 valid student-module records, we extract 16 behavioral features spanning platform interactions, study regularity, and assessment habits. "
-        "We apply logarithmic compression on interaction counts and standardized scaling while isolating final grades to prevent target leakage. "
-        "A sweep across k in [2, 8] reveals optimal separation at k = 4 (Silhouette score: 0.4212, Davies-Bouldin index: 0.9066, Calinski-Harabasz score: 19,873.08), "
-        "yielding four distinct learner profiles: High-Achieving Self-Directed (22.1%), Steady Learners (37.7%), Deadline Crammers (22.7%), and Disengaged At-Risk "
-        "Students (17.4%). Principal Component Analysis shows that two dimensions capture 82.0% of the total variance. Statistical validation against final academic "
-        "outcomes demonstrates strong dependency (Chi-Square = 12,136.24, df = 9, p < 0.0001, Cramer's V = 0.5375, NMI = 0.310, ARI = 0.2778), with Cluster 0 capturing "
-        "69.4% of Distinction recipients and Cluster 3 capturing 73.0% of course dropouts. Finally, we map cluster centroids into actionable, four-week learning roadmaps "
-        "implemented within an interactive dashboard for proactive academic advising."
+        "Most university learning management systems deliver course materials on rigid, identical schedules, regardless of how differently students "
+        "interact with the platform. Existing early warning alerts depend heavily on midterm marks, which usually arrive after disengaged students have "
+        "already fallen too far behind to recover. In this study, we develop an unsupervised segmentation pipeline that clusters students by their clickstream "
+        "patterns and maps each group to a targeted four-week study plan. Working with the Open University Learning Analytics Dataset (OULAD) across 14,003 "
+        "student records, we extracted 16 behavioral features measuring platform interactions, study regularity, and assessment habits. We used a log-plus-one "
+        "transform to handle extreme click volumes, standardized all features, and isolated course outcomes to prevent target leakage. Testing cluster counts "
+        "from k = 2 to k = 8 showed that k = 4 gave the cleanest separation (Silhouette score of 0.4212, Davies-Bouldin index of 0.9066, and a peak "
+        "Calinski-Harabasz score of 19,873.08). The four resulting groups capture distinct study styles: High-Achieving Self-Directed learners (22.1%), "
+        "Steady and Consistent learners (37.7%), Deadline Crammers (22.7%), and Disengaged At-Risk students (17.4%). In a two-dimensional PCA projection, "
+        "the first two components account for 82.0% of the overall variance. Extrinsic validation against recorded course outcomes confirmed strong "
+        "correlation (Chi-Square = 12,136.24, df = 9, p < 0.0001, and Cramer's V = 0.5375), with Cluster 0 holding 69.4% of all Distinction grades and "
+        "Cluster 3 holding 73.0% of all withdrawals. Finally, we convert the cluster centroids into actionable weekly study plans and integrate them into "
+        "an interactive advisory interface."
     )
     r_abs_txt.font.name = 'Times New Roman'; r_abs_txt.font.size = Pt(9.0); r_abs_txt.font.italic = True
     
@@ -515,73 +513,67 @@ def generate_docx():
     p_idx.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     p_idx.paragraph_format.space_before = Pt(0)
     p_idx.paragraph_format.space_after = Pt(8)
-    r_idx_lbl = p_idx.add_run("Index Terms—")
+    r_idx_lbl = p_idx.add_run("Index Terms: ")
     r_idx_lbl.font.name = 'Times New Roman'; r_idx_lbl.font.size = Pt(9.0); r_idx_lbl.font.bold = True; r_idx_lbl.font.italic = True
-    r_idx_txt = p_idx.add_run("Educational Data Mining, Learning Analytics, k-Means Clustering, Student Engagement, Personalized Learning Path, OULAD, Unsupervised Segmentation.")
+    r_idx_txt = p_idx.add_run("Educational data mining, learning analytics, k-means clustering, student engagement, personalized learning paths, OULAD, unsupervised segmentation.")
     r_idx_txt.font.name = 'Times New Roman'; r_idx_txt.font.size = Pt(9.0); r_idx_txt.font.bold = True
 
     # ----------------------------------------------------
-    # I. INTRODUCTION
+    # I. INTRODUCTION (Natural Academic Voice, Varied Cadence)
     # ----------------------------------------------------
     add_heading1("I. INTRODUCTION")
     add_body_p(
-        "Digital higher education and virtual learning environments (VLEs) have expanded access to instructional resources at an unprecedented scale. "
-        "Despite this reach, digital platforms deliver coursework through uniform, one-size-fits-all schedules. In brick-and-mortar classrooms, "
-        "instructors observe student attentiveness, pick up on confusion, and adapt their teaching pace on the fly. Digital platforms, by contrast, "
-        "record massive volumes of interaction logs but lack automated mechanisms to interpret these behavioral differences. As a result, self-directed "
-        "learners complete modules smoothly, whereas students with irregular study patterns fall behind without timely support [1]."
+        "Virtual learning environments (VLEs) allow universities to distribute course content to thousands of students at once. Yet this convenience "
+        "creates an instructional challenge: courses run at a single, fixed pace for everyone. In physical classrooms, instructors can observe whether "
+        "students look confused or disengaged and adjust their lectures accordingly. Digital platforms lack that immediate feedback loop. Instead, they "
+        "record raw clickstreams silently, while students with irregular study habits drift toward failure without early notice [1]."
     )
     add_body_p(
-        "Standard institutional early warning systems rely heavily on summative assessment milestones, such as midterm test scores. By the time these "
-        "marks become available—often eight to ten weeks into a term—struggling students have already disengaged or dropped out [2], [4]. Educational data "
-        "mining (EDM) shows that subtle digital traces, such as login frequency, resource downloads, and submission timing, diverge weeks before exam "
-        "grades drop [3], [5]. These digital footprints offer an earlier, non-intrusive window into student study habits."
+        "Most institutional interventions come too late. Retention teams typically rely on midterm scores or major assignment submissions. Because "
+        "those grades often take eight to ten weeks to appear, students who fall behind early have frequently dropped out before anyone reaches out to them [2], [4]. "
+        "Educational data mining research shows that passive platform records, including login frequencies, reading downloads, and the timing of assignment submissions, "
+        "diverge weeks before formal test grades reflect any trouble [3], [5]. These digital footprints provide an earlier signal of whether a student is keeping up."
     )
     add_body_p(
-        "Turning raw clickstream logs into practical instructional interventions brings several analytical hurdles. First, raw click counts show heavy right-skew: "
-        "active students generate tens of thousands of clicks, while disengaged peers register very few. Second, supervised models frequently risk target leakage "
-        "or function as black boxes that fail to explain how a student learns. Third, unsupervised studies often stop at reporting mathematical clusters without "
-        "verifying them against academic outcomes or translating centroids into structured study roadmaps."
+        "Translating click logs into practical academic advice involves several concrete obstacles. Raw click counts are heavily right-skewed; highly active "
+        "students log tens of thousands of clicks, while struggling students record only a few dozen. In addition, supervised models often suffer from target "
+        "leakage if early marks are included as features, or they act as black boxes that forecast pass or fail without explaining what study habits need correcting. "
+        "Many unsupervised studies also stop at reporting cluster metrics without checking whether the clusters correspond to actual course completion or translating "
+        "them into concrete study schedules."
     )
     add_body_p(
-        "To tackle these issues, this project introduces EduCluster ML, an unsupervised segmentation and recommendation pipeline. Our work focuses on three primary goals:\n"
-        "1) Feature Compilation and Preprocessing: We engineer 16 multi-domain features from the Open University Learning Analytics Dataset (N = 14,003), "
-        "apply log-plus-one skew correction and z-score standardization, and keep final course outcomes quarantined to avoid target leakage.\n"
-        "2) Unsupervised Segmentation and Dimensionality Reduction: We sweep k in [2, 8] across multiple cluster metrics, identify four distinct behavioral "
-        "personas, and visualize separation using 2D Principal Component Analysis (82.0% variance).\n"
-        "3) Extrinsic Validation and Personalized Learning Path Design: We validate cluster partitions against final course outcomes using Chi-Square, "
-        "Cramer's V, NMI, and ARI, and map cluster centroids to four-week prescriptive learning roadmaps."
+        "This paper presents an unsupervised clustering and recommendation framework called EduCluster ML to address these challenges. Our investigation pursues "
+        "three main goals. First, we engineer 16 multi-domain features from the OULAD cohort (N = 14,003), correct for skewness, standardize the inputs, "
+        "and isolate outcome grades. Second, we evaluate clustering configurations from k = 2 to k = 8 across four validation indices, examine the resulting "
+        "student profiles, and project the data into two principal components. Third, we test the discovered clusters against official academic results using "
+        "contingency metrics and translate cluster centroids into four-week personalized learning sequences."
     )
 
     # ----------------------------------------------------
-    # II. RELATED WORK
+    # II. RELATED WORK (Critical Synthesis, Citing [1]-[8])
     # ----------------------------------------------------
     add_heading1("II. RELATED WORK")
     add_body_p(
-        "Research in learning analytics and educational data mining splits broadly into supervised performance forecasting and unsupervised behavioral segmentation. "
-        "Early research by Macfadyen and Dawson [5] established that student LMS engagement correlates closely with academic success, prompting the development "
-        "of rule-based alert systems. Tempelaar et al. [4] expanded on this by showing that continuous formative tracking offers much better diagnostic value "
-        "than one-off summative grades."
+        "Early work by Macfadyen and Dawson [5] showed that total LMS activity correlates with final course grades, spurring interest in automated alert systems. "
+        "Tempelaar et al. [4] later demonstrated that continuous tracking of formative engagement offers better diagnostic value than post-hoc summative marks."
     )
     add_body_p(
-        "The Open University Learning Analytics Dataset (OULAD), published by Kuzilek, Hlosta, and Zdrahal [1], has become a standard benchmark for testing "
-        "educational machine learning models. Most earlier OULAD studies focused on supervised classification to predict binary pass/fail or dropout status [2]. "
-        "While supervised classifiers achieve high accuracy, they often suffer from feature leakage when early assignment grades are included, and they fail "
-        "to reveal underlying study habits. Baker and Inventado [3] noted that predicting an outcome does not explain why a student is struggling, making it "
-        "hard for instructors to prescribe targeted help."
+        "The Open University Learning Analytics Dataset (OULAD), released by Kuzilek et al. [1], is widely used to benchmark educational machine learning models. "
+        "Most OULAD research focuses on supervised classification to predict binary pass/fail or dropout outcomes [2]. While supervised models can achieve high accuracy, "
+        "they often struggle with target leakage when early assignment grades are included in the training set. Furthermore, binary predictions tell instructors "
+        "who might fail, but they do not describe the student's study habits or show where help is needed [3]."
     )
     add_body_p(
-        "Unsupervised clustering offers a way to discover natural groupings without relying on predefined labels. Arthur and Vassilvitskii [7] addressed "
-        "sensitivity to initial seeds with the k-means++ algorithm, ensuring faster and more reliable convergence. Rousseeuw [6] introduced the silhouette "
-        "coefficient, which balances cohesion within clusters against separation between them. For validating categorical associations, Cramer [8] established "
-        "the standard chi-square effect size formulation."
+        "Unsupervised clustering groups students by their behavioral patterns without requiring pre-labeled data. Arthur and Vassilvitskii [7] introduced k-means++ seeding, "
+        "which resolves poor local convergence by spreading out initial cluster centers. Rousseeuw [6] developed the silhouette coefficient to evaluate how well separated "
+        "clusters are relative to their internal tightness. For testing categorical associations between clusters and external outcomes, Cramer [8] established the "
+        "standard chi-square effect size formulation."
     )
     add_body_p(
-        "Despite these contributions, three significant gaps remain in published EDM research. First, many studies evaluate small cohorts (N < 1,000) from single "
-        "courses, limiting generalizability across STEM subjects. Second, existing feature sets emphasize gross click volumes while omitting submission delay "
-        "metrics, which are critical for distinguishing steady, consistent learners from last-minute crammers. Third, most clustering papers omit extrinsic "
-        "validation against official grades, leaving it unclear whether mathematical clusters correspond to real educational performance. This study addresses "
-        "all three gaps directly."
+        "Despite these established methods, three gaps persist in current learning analytics studies. First, many papers analyze cohorts of fewer than 1,000 students "
+        "from a single course, limiting how well the findings transfer across subjects. Second, most feature sets count total clicks while ignoring submission delay "
+        "metrics, which are essential for distinguishing consistent students from last-minute crammers. Third, clustering papers frequently omit extrinsic validation "
+        "against course grades, leaving it uncertain whether the mathematical clusters correspond to real student outcomes. Our study directly targets these gaps."
     )
 
     # ----------------------------------------------------
@@ -590,15 +582,14 @@ def generate_docx():
     add_heading1("III. METHODOLOGY")
     add_heading2("A. Dataset Selection and Cohort Filtering")
     add_body_p(
-        "We run our experiments on the Open University Learning Analytics Dataset (OULAD) [1]. OULAD tracks student demographics, VLE clickstreams, "
-        "assessment requirements, and individual assignment submissions across several module presentations. We focus on STEM courses and exclude "
-        "banked assessments (is_banked = 1) to prevent prior-term transfer credits from distorting delay and score variance metrics. This filtering "
-        "produces a clean, cohesive dataset of N = 14,003 student-module records."
+        "We evaluate our methods using the Open University Learning Analytics Dataset (OULAD) [1]. OULAD tracks student demographics, VLE interactions, "
+        "assessment requirements, and assignment submissions across multiple courses and terms. We focus on STEM modules and exclude banked grades (is_banked = 1) "
+        "so that prior-term credits do not distort submission delays or score variance calculations. This filtering yields N = 14,003 student-module records."
     )
     add_body_p(
-        "We construct 16 behavioral features grouped into three domains: Platform Engagement (8 features), Attendance and Regularity (4 features), "
-        "and Assessment Performance (4 features), summarized in Table I. The official final grade (final_result: Distinction, Pass, Fail, Withdrawn) "
-        "is stored strictly as an external validation proxy and kept out of feature compilation."
+        "We construct 16 features across three domains: Platform Engagement (8 features), Attendance and Regularity (4 features), and Assessment Performance "
+        "(4 features). Table I lists the feature definitions. The official course grade (Distinction, Pass, Fail, Withdrawn) is quarantined as an external "
+        "validation check and excluded from feature compilation."
     )
 
     # TABLE I: 16 Features
@@ -647,8 +638,8 @@ def generate_docx():
 
     add_heading2("B. Data Preprocessing and Normalization")
     add_body_p(
-        "Raw click counts exhibit extreme positive skewness, with totals ranging from 0 to over 24,000. To stabilize variance and reduce the "
-        "impact of extreme outliers without altering student rankings, we apply a log-plus-one transformation:"
+        "Raw interaction counts show substantial right-skewness, with values ranging from 0 to over 24,000 clicks. We apply a log-plus-one transform "
+        "to compress extreme counts without altering student ranks:"
     )
     
     # Equation 1: Standardization
@@ -660,14 +651,14 @@ def generate_docx():
     r_eq1.font.name = 'Times New Roman'; r_eq1.font.size = Pt(9.5); r_eq1.font.italic = True
 
     add_body_p(
-        "where x'_ij represents the log-compressed feature value for student i on feature j, while μ_j and σ_j denote the empirical feature mean "
-        "and standard deviation. Standardizing all features ensures that wide-ranging click counts do not overwhelm normalized metrics like submission "
-        "delay or regularity. The final course outcome (final_result) is strictly quarantined from this scaling pipeline, guaranteeing zero label leakage."
+        "Here, x'_ij is the log-transformed value of feature j for student i, while μ_j and σ_j represent the feature mean and standard deviation. "
+        "Standardizing all features ensures that wide-ranging click counts do not overpower narrower metrics like submission delays or regularity indices. "
+        "Outcome labels remain quarantined during this entire process to prevent target leakage."
     )
 
-    add_heading2("C. k-Means Segmentation and Optimal Model Selection")
+    add_heading2("C. k-Means Segmentation and Model Selection")
     add_body_p(
-        "The k-means algorithm partitions the standardized cohort into K clusters by minimizing the within-cluster sum of squares (Inertia):"
+        "The k-means algorithm assigns the standardized observations into K clusters by minimizing the within-cluster sum of squares (Inertia):"
     )
 
     # Equation 2: Inertia
@@ -679,16 +670,16 @@ def generate_docx():
     r_eq2.font.name = 'Times New Roman'; r_eq2.font.size = Pt(9.5); r_eq2.font.italic = True
 
     add_body_p(
-        "where μ_k is the mean vector for cluster S_k. We initialize centroids with k-means++ [7] across 20 restarts (random_state = 42). "
-        "To select the best value for k, we sweep k from 2 to 8 using four metrics: Inertia, the Silhouette coefficient [6], the Davies-Bouldin index, "
-        "and the Calinski-Harabasz score. We then project the 16-dimensional space onto two principal components via PCA for visual verification."
+        "where μ_k represents the centroid for cluster S_k. We initialize centroids with k-means++ [7] across 20 restarts using random_state = 42. "
+        "To identify the appropriate cluster count, we evaluate k from 2 to 8 using Inertia, the Silhouette coefficient [6], the Davies-Bouldin index, "
+        "and the Calinski-Harabasz score. We also compute a two-dimensional PCA projection to visually inspect cluster boundaries."
     )
 
     add_heading2("D. Extrinsic Validation and Learning Path Mapping")
     add_body_p(
-        "Because clustering is unsupervised, we validate the clusters by testing their relationship against teacher-awarded course outcomes "
-        "(final_result). We compute a 4x4 contingency matrix and evaluate Pearson's Chi-Square test of independence (χ^2), Normalized Mutual "
-        "Information (NMI), and Adjusted Rand Index (ARI). We calculate practical effect size via Cramer's V [8]:"
+        "To test whether these unsupervised clusters correspond to real academic performance, we construct a 4x4 contingency matrix against official "
+        "teacher grades (final_result). We measure statistical dependence using Pearson's Chi-Square test (χ^2), Normalized Mutual Information (NMI), "
+        "and the Adjusted Rand Index (ARI). Effect size is computed with Cramer's V [8]:"
     )
 
     # Equation 3: Cramer's V
@@ -700,7 +691,7 @@ def generate_docx():
     r_eq3.font.name = 'Times New Roman'; r_eq3.font.size = Pt(9.5); r_eq3.font.italic = True
 
     add_body_p(
-        "where r = 4 and c = 4. For interactive deployment, new student inputs are assigned to the nearest cluster centroid by Euclidean distance in standardized space:"
+        "with r = 4 and c = 4. In the live interface, any new student input is mapped to the closest cluster centroid by Euclidean distance:"
     )
     p_dist = doc.add_paragraph()
     p_dist.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -709,7 +700,7 @@ def generate_docx():
     r_dist = p_dist.add_run("k* = argmin_k || z_active - μ_k ||_2")
     r_dist.font.name = 'Times New Roman'; r_dist.font.size = Pt(9.5); r_dist.font.italic = True
     add_body_p(
-        "The matched cluster index triggers a customized, four-week prescriptive learning sequence tailored to that persona's specific study challenges."
+        "The assigned cluster index then loads a four-week study roadmap designed around that group's specific study challenges."
     )
 
     # ----------------------------------------------------
@@ -718,10 +709,10 @@ def generate_docx():
     add_heading1("IV. RESULTS AND DISCUSSION")
     add_heading2("A. Optimal Cluster Selection Sweep")
     add_body_p(
-        "Table II details the mathematical metrics across k in [2, 8]. While k = 2 produces the highest silhouette score (0.5675), it merely separates "
-        "active learners from inactive ones, combining steady students and last-minute crammers into an undifferentiated mass. Increasing k to 4 "
-        "reduces inertia by 57.4% (dropping from 100,060.6 to 42,604.2) and drives the Calinski-Harabasz index to its global maximum of 19,873.08. "
-        "At the same time, the Davies-Bouldin index stays low at 0.9066."
+        "Table II summarizes the clustering metrics for k between 2 and 8. A two-cluster solution gives the highest silhouette score (0.5675), "
+        "but it simply splits students into active and inactive cohorts, hiding last-minute crammers inside the larger group. Increasing k to 4 "
+        "lowers inertia by 57.4% (from 100,060.6 to 42,604.2) and maximizes the Calinski-Harabasz index at 19,873.08. The Davies-Bouldin index "
+        "remains low at 0.9066."
     )
 
     # TABLE II: Evaluation Sweep
@@ -764,9 +755,8 @@ def generate_docx():
     format_table_cells(tbl2, {0: WD_ALIGN_PARAGRAPH.CENTER, 1: WD_ALIGN_PARAGRAPH.RIGHT, 2: WD_ALIGN_PARAGRAPH.RIGHT, 3: WD_ALIGN_PARAGRAPH.RIGHT, 4: WD_ALIGN_PARAGRAPH.RIGHT})
 
     add_body_p(
-        "Moving past k = 4 causes the Davies-Bouldin index to worsen sharply (jumping from 0.9066 to 1.8371 at k = 5), indicating fragmented, overlapping "
-        "subgroups. As illustrated in Fig. 1, k = 4 strikes the optimal mathematical and educational balance by isolating last-minute crammers while "
-        "preserving cohesive cluster boundaries."
+        "Beyond k = 4, the Davies-Bouldin index jumps to 1.8371 at k = 5, indicating that additional clusters overlap and fragment coherent groups. "
+        "As Fig. 1 shows, k = 4 balances separation and cohesion while isolating deadline crammers as a distinct group."
     )
 
     # Embed Fig 1
@@ -777,18 +767,17 @@ def generate_docx():
 
     add_heading2("B. Behavioral Persona Profiles and Dimensionality Reduction")
     add_body_p(
-        "Analyzing the standardized feature centroids at k = 4 uncovers four distinct behavioral student archetypes, summarized in Table III:"
+        "Examining the cluster centroids at k = 4 reveals four clear study archetypes, detailed in Table III:"
     )
     add_body_p(
-        "1) Cluster 0: High-Achieving Self-Directed (22.1%, n = 3,100). These students display high interaction volumes (median 2,835 clicks over 88 active days), "
-        "strong assessment scores (88.5%), and early assignment submissions (averaging 4.5 days ahead of deadlines), completing 98.0% of coursework.\n"
-        "2) Cluster 1: Steady and Consistent Learners (37.7%, n = 5,280). Making up the largest single group, these learners maintain reliable pacing "
-        "(1,096 clicks across 58 active days), solid scores (71.0%), and punctual submissions (1.5 days early), achieving a 92.0% completion rate.\n"
-        "3) Cluster 2: Deadline Crammers / Selective Engagers (22.7%, n = 3,180). This group shows moderate total clicks (544 over 27 active days) "
-        "concentrated in sharp bursts right before deadlines. They average 52.5% on assessments and submit assignments an average of 2.2 days late, "
-        "with course completion falling to 75.0%.\n"
-        "4) Cluster 3: Disengaged / At-Risk Cohort (17.4%, n = 2,443). These students show minimal engagement (109 clicks across just 11 active days), "
-        "low exam scores (23.5%), chronic submission delays (+9.5 days), and a low 32.0% completion rate, indicating severe dropout risk."
+        "Cluster 0: High-Achieving Self-Directed (22.1%, n = 3,100). These students log high interaction volumes (median 2,835 clicks over 88 active days), "
+        "maintain high assessment scores (88.5%), and submit assignments an average of 4.5 days early, completing 98.0% of course requirements.\n"
+        "Cluster 1: Steady and Consistent Learners (37.7%, n = 5,280). This group represents the core student population. They maintain steady platform activity "
+        "(1,096 clicks across 58 days), earn solid marks (71.0%), submit work 1.5 days early, and complete 92.0% of assignments.\n"
+        "Cluster 2: Deadline Crammers / Selective Engagers (22.7%, n = 3,180). These students show moderate click totals (544 clicks over 27 days) that spike "
+        "right before deadlines. They average 52.5% on tests and submit work 2.2 days late on average, with completion falling to 75.0%.\n"
+        "Cluster 3: Disengaged / At-Risk Cohort (17.4%, n = 2,443). These learners interact minimally with the platform (109 clicks over 11 days), score poorly "
+        "on exams (23.5%), submit work 9.5 days late on average, and complete only 32.0% of their coursework."
     )
 
     # TABLE III: Personas
@@ -834,8 +823,7 @@ def generate_docx():
 
     add_heading2("C. Extrinsic Statistical Validation")
     add_body_p(
-        "To test whether these unsupervised clusters correspond to real-world performance, we compare them against official course outcomes "
-        "(Distinction, Pass, Fail, Withdrawn). The contingency matrix is displayed in Table IV and visual heat-map in Fig. 4."
+        "Table IV and Fig. 4 present the contingency analysis comparing the four clusters with official course outcomes."
     )
 
     # TABLE IV: Contingency Matrix
@@ -871,10 +859,10 @@ def generate_docx():
     format_table_cells(tbl4, {0: WD_ALIGN_PARAGRAPH.LEFT, 1: WD_ALIGN_PARAGRAPH.RIGHT, 2: WD_ALIGN_PARAGRAPH.RIGHT, 3: WD_ALIGN_PARAGRAPH.RIGHT, 4: WD_ALIGN_PARAGRAPH.RIGHT, 5: WD_ALIGN_PARAGRAPH.RIGHT})
 
     add_body_p(
-        "Pearson's Chi-Square test of independence yields χ^2 = 12,136.24 with 9 degrees of freedom (p < 0.0001). Cramer's V equals 0.5375, "
-        "indicating an exceptionally strong relationship between unsupervised behavioral clusters and academic success. Normalized Mutual Information "
-        "(NMI = 0.310) and Adjusted Rand Index (ARI = 0.2778) corroborate this correspondence. Notably, 69.4% of all Distinction recipients fall into "
-        "Cluster 0, 60.9% of Pass recipients reside in Cluster 1, 48.4% of Failures occur in Cluster 2, and 73.0% of Course Withdrawals concentrate in Cluster 3."
+        "Pearson's Chi-Square test yields χ^2 = 12,136.24 (df = 9, p < 0.0001). Cramer's V is 0.5375, indicating a strong relationship between "
+        "the unsupervised behavioral groups and final grades. The information-theoretic measures also show close agreement, with NMI = 0.310 and "
+        "ARI = 0.2778. Specifically, 69.4% of all Distinction recipients fall into Cluster 0, 60.9% of Pass recipients reside in Cluster 1, "
+        "48.4% of Failures occur in Cluster 2, and 73.0% of all course withdrawals appear in Cluster 3."
     )
 
     # Embed Fig 4
@@ -883,10 +871,9 @@ def generate_docx():
         "Contingency matrix heatmap between clusters and final course outcomes (Chi-Square = 12,136.24, p < 0.0001, Cramer's V = 0.5375)."
     )
 
-    add_heading2("D. Personalized Four-Week Learning Path Roadmaps")
+    add_heading2("D. Four-Week Personalized Learning Path Roadmaps")
     add_body_p(
-        "To translate cluster assignments into practical interventions, we map each cluster centroid to a targeted, four-week study sequence. "
-        "These roadmaps, presented in Table V, provide structured weekly goals and targeted study hours based on observed student deficits:"
+        "Table V outlines the prescriptive study plans mapped to each cluster centroid."
     )
 
     # TABLE V: 4-Week Learning Paths
@@ -921,22 +908,21 @@ def generate_docx():
     format_table_cells(tbl5, {0: WD_ALIGN_PARAGRAPH.CENTER, 1: WD_ALIGN_PARAGRAPH.LEFT, 2: WD_ALIGN_PARAGRAPH.LEFT, 3: WD_ALIGN_PARAGRAPH.LEFT, 4: WD_ALIGN_PARAGRAPH.LEFT, 5: WD_ALIGN_PARAGRAPH.RIGHT})
 
     add_body_p(
-        "For Cluster 0, interventions emphasize honors extensions and peer leadership to maintain motivation. For Cluster 1, the focus is on consolidating "
-        "foundations and guiding students toward distinctions. For Cluster 2 (Crammers), the roadmap enforces 48-hour pre-deadline draft locks and spaced "
-        "practice to break procrastination habits. For Cluster 3 (At-Risk), the pathway initiates immediate advisor check-ins, foundational recaps, and "
-        "guided exercises to help students achieve minimum passing mastery."
+        "For Cluster 0, the plan focuses on advanced problem sets, honors tasks, and peer forum leadership to maintain motivation. "
+        "For Cluster 1, modules review core concepts and offer timed practice tests to help students push toward distinctions. "
+        "For Cluster 2, the schedule breaks assignments into micro-milestones and enforces 48-hour pre-deadline draft checkpoints to curb procrastination. "
+        "For Cluster 3, the pathway sets up advisor check-ins, foundational video reviews, and guided exercises to help students reach a passing standard."
     )
 
     add_heading2("E. System Deployment and Limitations")
     add_body_p(
-        "We deployed this pipeline inside an interactive Streamlit application (EduCluster ML). The interface features preset persona buttons and interactive "
-        "sliders that allow instructors and advisors to simulate behavioral patterns, observe real-time cluster assignments, and review generated learning roadmaps."
+        "We implemented this pipeline in an interactive Streamlit application (EduCluster ML). Advisors can use persona presets or adjust individual sliders "
+        "to test different engagement patterns, observe real-time cluster assignments, and review the resulting study schedules."
     )
     add_body_p(
-        "We note two principal limitations. First, this analysis uses cumulative semester metrics rather than rolling weekly time windows, which cannot yet "
-        "capture week-to-week transitions between clusters. Second, k-means creates hard cluster boundaries, whereas students on the border between "
-        "steady learning and deadline cramming would benefit from soft probabilistic assignments (e.g., Gaussian Mixture Models). Addressing these aspects "
-        "forms our primary focus for future work."
+        "We note two main limitations. First, our current features aggregate interactions across the full term, so they do not yet track week-to-week shifts between clusters. "
+        "Second, k-means enforces hard boundaries, meaning students near the threshold between steady learning and cramming do not receive soft probability scores. "
+        "Exploring longitudinal modeling and soft clustering methods represents our next step."
     )
 
     # ----------------------------------------------------
@@ -944,12 +930,12 @@ def generate_docx():
     # ----------------------------------------------------
     add_heading1("V. CONCLUSION")
     add_body_p(
-        "This study demonstrates that unsupervised k-means clustering applied to passive VLE clickstream logs can segment student cohorts into actionable "
-        "behavioral archetypes without relying on late exam grades. Using 16 engineered features from the OULAD cohort (N = 14,003), our pipeline identifies "
-        "four clear learner personas (k = 4) explaining 82.0% of feature variance in 2D PCA space. Extrinsic validation confirms a strong statistical link "
-        "to official course outcomes (Chi-Square = 12,136.24, p < 0.0001, Cramer's V = 0.5375), cleanly identifying 69.4% of Distinction earners in Cluster 0 "
-        "and 73.0% of Course Dropouts in Cluster 3. By linking cluster centroids directly to four-week prescriptive learning paths, EduCluster ML provides "
-        "a practical bridge between unsupervised machine learning and proactive academic support."
+        "This study shows that unsupervised k-means clustering applied to passive VLE clickstreams can segment student cohorts into meaningful study "
+        "archetypes without relying on late exam grades. Using 16 engineered features from the OULAD dataset (N = 14,003), the model identifies four clear "
+        "learner personas at k = 4, accounting for 82.0% of variance in two PCA dimensions. Extrinsic validation confirms that these behavioral groupings "
+        "correspond closely to teacher-graded outcomes (Chi-Square = 12,136.24, p < 0.0001, Cramer's V = 0.5375), capturing 69.4% of Distinctions in "
+        "Cluster 0 and 73.0% of dropouts in Cluster 3. By connecting cluster centroids to four-week study roadmaps, the system provides a practical tool "
+        "for early, proactive academic advising."
     )
 
     # ----------------------------------------------------
@@ -957,8 +943,8 @@ def generate_docx():
     # ----------------------------------------------------
     add_heading1("ACKNOWLEDGMENT")
     add_body_p(
-        "The authors thank the School of Computer Science & Engineering at Lovely Professional University for technical infrastructure and academic "
-        "support during this research project."
+        "The authors thank the School of Computer Science & Engineering at Lovely Professional University for providing the computing infrastructure "
+        "and academic resources used in this study."
     )
 
     # ----------------------------------------------------
@@ -1032,7 +1018,6 @@ def generate_pptx():
         return card
 
     def add_header(slide, title_text, category_text="EDUCLUSTER ML • PROJECT DEFENSE (SIH26036)"):
-        # Header category
         tb_cat = slide.shapes.add_textbox(PInches(0.8), PInches(0.45), PInches(11.7), PInches(0.35))
         tf_cat = tb_cat.text_frame
         tf_cat.word_wrap = True
@@ -1043,7 +1028,6 @@ def generate_pptx():
         p_c.font.color.rgb = TEXT_SUB
         p_c.font.name = 'Arial'
         
-        # Header Title
         tb_t = slide.shapes.add_textbox(PInches(0.8), PInches(0.75), PInches(11.7), PInches(0.65))
         tf_t = tb_t.text_frame
         tf_t.word_wrap = True
@@ -1065,7 +1049,6 @@ def generate_pptx():
     s1 = prs.slides.add_slide(blank_layout)
     set_slide_background(s1)
     
-    # Hero Title Card
     c_hero = add_card_shape(s1, PInches(1.0), PInches(0.9), PInches(11.333), PInches(3.3), bg_rgb=PRGBColor(15, 23, 42), border_rgb=PRGBColor(56, 189, 248))
     tb_h = s1.shapes.add_textbox(PInches(1.4), PInches(1.15), PInches(10.5), PInches(2.8))
     tf_h = tb_h.text_frame
@@ -1093,7 +1076,6 @@ def generate_pptx():
     p3.font.name = 'Arial'
     p3.space_before = PPt(8)
 
-    # 3 Metadata Cards at the bottom
     meta_cards = [
         ("CANDIDATE", "Parasa Bhavyaswi\nReg No: 12502256\nB.Tech Computer Science & Engg", ACCENT_EMERALD),
         ("SUPERVISOR", "Dr. Bhupinder Singh\nAssociate Professor\nSchool of Computer Science & Engg", TEXT_SUB),
@@ -1121,11 +1103,10 @@ def generate_pptx():
 
     set_speaker_notes(
         s1,
-        "Good morning, esteemed committee members and supervisor Dr. Bhupinder Singh. I am Parasa Bhavyaswi, Reg. No. 12502256. "
-        "Today, I present my capstone defense: 'K-Means Clustering of Student Engagement and Performance Data for Personalized Learning Path Design' "
-        "(Project ID: SIH26036). In this research, we build an end-to-end unsupervised learning system that ingests passive clickstream logs "
-        "from over 14,000 university students, isolates four distinct study personas, validates them against teacher outcomes, and prescribes "
-        "tailored four-week learning paths."
+        "Good morning, committee members and Dr. Singh. I am Parasa Bhavyaswi, Reg. No. 12502256. "
+        "Today, I present my capstone project defense: 'K-Means Clustering of Student Engagement and Performance Data for Personalized Learning Path Design' "
+        "(Project ID: SIH26036). In this research, we build an unsupervised pipeline that ingests clickstream records from over 14,000 university students, "
+        "identifies four distinct study personas, validates them against teacher outcomes, and prescribes tailored four-week learning paths."
     )
 
     # ----------------------------------------------------
@@ -1165,7 +1146,7 @@ def generate_pptx():
         s2,
         "Slide 2 outlines the motivation for our work. Digital learning platforms face a silent attrition crisis: while thousands enroll, "
         "as many as 40% withdraw or fail. Because online platforms deliver identical schedules, instructors cannot observe non-verbal signals. "
-        "Worse, traditional retention models wait for midterm exams—often at week 8 or 10. By then, struggling students have stopped logging in. "
+        "Worse, traditional retention models wait for midterm exams (often at week 8 or 10). By then, struggling students have stopped logging in. "
         "EduCluster ML solves this by analyzing passive VLE clicks, submission delay dynamics, and regularity, catching disengagement long before "
         "grades drop."
     )
@@ -1229,7 +1210,6 @@ def generate_pptx():
     set_slide_background(s4)
     add_header(s4, "Dataset & 16-Feature Engineering Pipeline (Objective 1)")
     
-    # 3 domain cards top
     feat_domains = [
         ("Platform Engagement (8)", "• total_clicks (log1p)\n• active_days (count)\n• clicks_per_active_day\n• forum_clicks (log1p)\n• quiz_clicks (log1p)\n• resource_clicks (log1p)\n• url_clicks (log1p)\n• subpage_clicks (log1p)", TEXT_SUB),
         ("Regularity & Attendance (4)", "• activity_span_days (span)\n• regularity_score (entropy)\n• early_engagement_ratio (W1-3)\n• late_submission_rate (%)", ACCENT_EMERALD),
@@ -1255,7 +1235,6 @@ def generate_pptx():
         p_b.font.name = 'Arial'
         p_b.space_before = PPt(6)
 
-    # Bottom summary card
     c_bot = add_card_shape(s4, PInches(0.8), PInches(5.0), PInches(11.733), PInches(1.8))
     tb_bot = s4.shapes.add_textbox(PInches(1.0), PInches(5.1), PInches(11.3), PInches(1.6))
     tf_bot = tb_bot.text_frame
@@ -1283,7 +1262,7 @@ def generate_pptx():
     set_speaker_notes(
         s4,
         "Slide 4 details our feature engineering pipeline for Objective 1. We extracted 16 features across three domains: Platform Engagement, "
-        "Regularity, and Assessment Habits. Crucially, we introduced submission delay—negative values indicate early submissions, positive values "
+        "Regularity, and Assessment Habits. Crucially, we introduced submission delay: negative values indicate early submissions, positive values "
         "indicate late submissions. Because interaction clicks exhibit heavy right-skew, we applied log1p compression before standardizing with "
         "StandardScaler. Finally, we guaranteed zero label leakage: the ground-truth final_result was quarantined exclusively for validation."
     )
@@ -1295,11 +1274,9 @@ def generate_pptx():
     set_slide_background(s5)
     add_header(s5, "Model Selection: Why k = 4 Clusters? (Objective 2)")
     
-    # Left side: Embedded Chart
     add_card_shape(s5, PInches(0.8), PInches(1.6), PInches(6.4), PInches(5.2))
     s5.shapes.add_picture(os.path.join(ASSETS_DIR, 'fig1_elbow_silhouette.png'), PInches(0.95), PInches(1.75), PInches(6.1), PInches(4.9))
     
-    # Right side: Metric Comparison Table & Insights
     add_card_shape(s5, PInches(7.4), PInches(1.6), PInches(5.133), PInches(5.2))
     tb_r = s5.shapes.add_textbox(PInches(7.6), PInches(1.75), PInches(4.7), PInches(4.9))
     tf_r = tb_r.text_frame
@@ -1332,7 +1309,7 @@ def generate_pptx():
     p_tbl.space_before = PPt(6)
     
     p_box = tf_r.add_paragraph()
-    p_box.text = "Key Takeaway: k = 4 maximizes educational utility and mathematical separation, isolating the 'Deadline Crammer' persona."
+    p_box.text = "Key Takeaway: k = 4 balances educational utility and mathematical separation, isolating the 'Deadline Crammer' persona."
     p_box.font.size = PPt(10.5)
     p_box.font.bold = True
     p_box.font.color.rgb = ACCENT_EMERALD
@@ -1354,7 +1331,6 @@ def generate_pptx():
     set_slide_background(s6)
     add_header(s6, "Discovered Student Personas & 2D PCA Projection (Objective 2)")
     
-    # Left side: 4 Persona Cards
     personas_cards = [
         ("Cluster 0: High-Achieving (22.1%, n = 3,100)", "Score: 88.5% | Clicks: 2,835 | Days: 88 | Delay: -4.5d | Comp: 98%\nProactive pacing, early submissions, high autonomy, deep forum presence.", ACCENT_EMERALD),
         ("Cluster 1: Steady Learners (37.7%, n = 5,280)", "Score: 71.0% | Clicks: 1,096 | Days: 58 | Delay: -1.5d | Comp: 92%\nConsistent study rhythm, punctual submissions, modal core student body.", TEXT_SUB),
@@ -1381,7 +1357,6 @@ def generate_pptx():
         p_desc.font.name = 'Arial'
         p_desc.space_before = PPt(2)
 
-    # Right side: Embedded PCA Plot
     add_card_shape(s6, PInches(7.0), PInches(1.6), PInches(5.533), PInches(5.2))
     s6.shapes.add_picture(os.path.join(ASSETS_DIR, 'fig2_pca_clusters.png'), PInches(7.15), PInches(1.75), PInches(5.2), PInches(4.9))
 
@@ -1400,11 +1375,9 @@ def generate_pptx():
     set_slide_background(s7)
     add_header(s7, "Statistical Validation Against Teacher Outcomes (Objective 3)")
     
-    # Left side: Embedded Heatmap
     add_card_shape(s7, PInches(0.8), PInches(1.6), PInches(6.4), PInches(5.2))
     s7.shapes.add_picture(os.path.join(ASSETS_DIR, 'fig4_contingency_heatmap.png'), PInches(0.95), PInches(1.75), PInches(6.1), PInches(4.9))
     
-    # Right side: Validation Metrics
     add_card_shape(s7, PInches(7.4), PInches(1.6), PInches(5.133), PInches(5.2))
     tb_v = s7.shapes.add_textbox(PInches(7.6), PInches(1.75), PInches(4.7), PInches(4.9))
     tf_v = tb_v.text_frame
@@ -1532,7 +1505,6 @@ def generate_pptx():
         p_b.font.name = 'Arial'
         p_b.space_before = PPt(8)
 
-    # Live Status Card
     c_live = add_card_shape(s9, PInches(0.8), PInches(5.6), PInches(11.733), PInches(1.3))
     tb_l = s9.shapes.add_textbox(PInches(1.0), PInches(5.7), PInches(11.3), PInches(1.1))
     tf_l = tb_l.text_frame
@@ -1566,7 +1538,6 @@ def generate_pptx():
     set_slide_background(s10)
     add_header(s10, "Limitations, Future Scope & Defense Conclusion")
     
-    # 2 Big Cards
     col_cards = [
         ("Academic Limitations",
          "• Static Cumulative Snapshot: Semester-aggregated metrics do not track week-to-week transitions.\n\n"
@@ -1598,7 +1569,6 @@ def generate_pptx():
         p_b.font.name = 'Arial'
         p_b.space_before = PPt(8)
 
-    # Bottom summary card
     c_final = add_card_shape(s10, PInches(0.8), PInches(5.4), PInches(11.733), PInches(1.5))
     tb_f = s10.shapes.add_textbox(PInches(1.0), PInches(5.5), PInches(11.3), PInches(1.3))
     tf_f = tb_f.text_frame
@@ -1625,8 +1595,8 @@ def generate_pptx():
     set_speaker_notes(
         s10,
         "In conclusion, EduCluster ML proves that unsupervised clickstream clustering can detect student study habits and automate meaningful "
-        "learning roadmaps weeks before midterm examinations. We have openly acknowledged our limitations—such as static cumulative snapshots "
-        "and hard boundaries—and outlined future directions including longitudinal RNNs and Gaussian Mixture Models. I express my sincere gratitude "
+        "learning roadmaps weeks before midterm examinations. We have openly acknowledged our limitations (such as static cumulative snapshots "
+        "and hard boundaries) and outlined future directions including longitudinal RNNs and Gaussian Mixture Models. I express my sincere gratitude "
         "to Dr. Bhupinder Singh and the committee members for their time and guidance. I welcome your questions."
     )
 
@@ -1656,4 +1626,3 @@ if __name__ == "__main__":
         import traceback
         traceback.print_exc()
         sys.exit(1)
-
