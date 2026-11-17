@@ -2,7 +2,7 @@
 Recommender Module (Objective 4)
 --------------------------------
 Personalized Learning Path Recommendation Engine & 4-Stage Roadmaps
-Project: EduCluster ML (Project ID: SIH26036)
+Project: EduPulse (Project ID: SIH26036)
 
 Candidate: Parasa Bhavyaswi (Reg No: 12502256)
 Supervisor: Dr. Bhupinder Singh

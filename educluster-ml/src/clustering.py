@@ -2,7 +2,7 @@
 Clustering Module (Objective 2)
 -------------------------------
 K-Means Segmentation, Optimal-k Sweep, Cluster Mapping & PCA Projections
-Project: EduCluster ML (Project ID: SIH26036)
+Project: EduPulse (Project ID: SIH26036)
 
 This module executes:
 1. Optimal-k sweep (k in [2, 8]) computing Inertia, Silhouette, Davies-Bouldin, and Calinski-Harabasz.

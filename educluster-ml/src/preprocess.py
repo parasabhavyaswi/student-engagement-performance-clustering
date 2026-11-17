@@ -2,7 +2,7 @@
 Preprocess Module (Objective 1)
 --------------------------------
 Feature Compilation, Engineering & StandardScaler Pipeline
-Project: EduCluster ML (Project ID: SIH26036)
+Project: EduPulse (Project ID: SIH26036)
 
 This module loads Open University Learning Analytics Dataset (OULAD) CSVs,
 or invokes a calibrated deterministic synthetic generator matching exact

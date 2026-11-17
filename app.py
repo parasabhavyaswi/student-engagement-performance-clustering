@@ -1,5 +1,5 @@
 """
-Root Entrypoint for EduCluster ML Dashboard
+Root Entrypoint for EduPulse Dashboard
 Delegates directly to educluster-ml/app.py
 """
 

@@ -1,5 +1,6 @@
 """
-EduCluster ML: K-Means Clustering of Student Engagement & Performance Data
+EduPulse: Student Engagement Analytics and Personalized Learning Paths
+K-Means Clustering of Student Engagement & Performance Data
 for Personalized Learning Path Design
 
 Project Details:

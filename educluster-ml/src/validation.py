@@ -2,7 +2,7 @@
 Validation Module (Objective 3)
 -------------------------------
 Extrinsic & Intrinsic Cluster Validation Engine
-Project: EduCluster ML (Project ID: SIH26036)
+Project: EduPulse (Project ID: SIH26036)
 
 This module computes:
 1. Normalized Mutual Information (NMI) against teacher-observed final_result.

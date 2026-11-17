@@ -1,5 +1,5 @@
 """
-EduCluster ML: Student Engagement & Performance Analytics
+EduPulse: Student Engagement Analytics and Personalized Learning Paths
 Interactive Streamlit Dashboard (Project ID: SIH26036)
 
 Production dashboard implementing:
@@ -58,7 +58,7 @@ from src.recommender import (
 # Streamlit Page Configuration
 # -----------------------------------------------------------------------------
 st.set_page_config(
-    page_title="EduCluster ML",
+    page_title="EduPulse",
     page_icon="🎓",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -415,7 +415,7 @@ df_centroids_raw, df_centroids_norm = get_centroid_profiles(df_raw, cluster_labe
 with st.sidebar:
     st.markdown("""
     <div class="sidebar-header-box">
-        <div class="sidebar-brand">🎓 Edu<span>Cluster</span></div>
+        <div class="sidebar-brand">🎓 Edu<span>Pulse</span></div>
         <div class="sidebar-tag">STUDENT PERSONA SIMULATOR</div>
     </div>
     """, unsafe_allow_html=True)
@@ -556,7 +556,7 @@ with st.sidebar:
 # -----------------------------------------------------------------------------
 # Main Header & Top KPI Row
 # -----------------------------------------------------------------------------
-st.markdown('<div class="main-header-title">EduCluster ML: Student Engagement & Performance Analytics</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-header-title">EduPulse: Student Engagement Analytics and Personalized Learning Paths</div>', unsafe_allow_html=True)
 st.markdown('<div class="main-header-subtitle">K-Means Clustering of Student Engagement and Performance Data for Personalized Learning Path Design</div>', unsafe_allow_html=True)
 
 # 5 Dark KPI Metric Cards in a horizontal row
@@ -1117,7 +1117,7 @@ with tab3:
     st.download_button(
         label="📥 Download Full Clustered Cohort Dataset (14,003 Records, CSV)",
         data=csv_data,
-        file_name="educluster_sih26036_clustered_students.csv",
+        file_name="edupulse_sih26036_clustered_students.csv",
         mime="text/csv",
         use_container_width=True
     )
