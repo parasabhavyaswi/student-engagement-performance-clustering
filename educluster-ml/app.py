@@ -445,7 +445,7 @@ with st.sidebar:
         min_value=0,
         max_value=3000,
         value=int(st.session_state["slider_clicks"]),
-        step=10,
+        step=1,
         key="slider_clicks",
         help="Log-transformed total clicks across quizzes, content, and forums"
     )

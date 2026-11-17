@@ -73,8 +73,7 @@ $$\chi^2 = 12,136.24 \quad (df = 9, p < 0.0001), \quad \text{Cramér's } V = 0.5
 student-engagement-performance-clustering/
 ├── PROJECT_REPORT.docx             # Complete IEEE two-column research paper (Word)
 ├── PROJECT_REPORT.pdf              # Publication-grade PDF version of research paper
-├── IEEE_Final_Project_Report.docx  # Full IEEE conference report
-├── EduCluster_ML_Presentation.pptx # 10-slide 16:9 defense deck with speaker notes
+├── EduPulse_Presentation.pptx      # 10-slide 16:9 defense deck with speaker notes
 ├── generate_deliverables.py        # Automated generator for paper, PDF, slides, and plots
 ├── app.py                          # Root Streamlit dashboard entrypoint
 ├── requirements.txt                # Unified Python dependency specifications
@@ -132,7 +131,7 @@ streamlit run app.py
 ```bash
 python generate_deliverables.py
 ```
-*Reproduces `PROJECT_REPORT.docx`, `PROJECT_REPORT.pdf`, `IEEE_Final_Project_Report.docx`, `EduCluster_ML_Presentation.pptx`, and all high-res plots in `assets/`.*
+*Reproduces `PROJECT_REPORT.docx`, `PROJECT_REPORT.pdf`, `EduPulse_Presentation.pptx`, and all high-res plots in `assets/`.*
 
 ---
 

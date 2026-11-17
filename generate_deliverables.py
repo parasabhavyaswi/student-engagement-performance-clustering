@@ -12,9 +12,7 @@ Affiliation: School of Computer Science & Engineering, Lovely Professional Unive
 Outputs:
 1. PROJECT_REPORT.docx (Strict IEEE Two-Column Conference Format, Complete Research Paper)
 2. PROJECT_REPORT.pdf (Pixel-Perfect PDF Generated via MS Word Rendering Engine)
-3. IEEE_Final_Project_Report.docx (Synchronized IEEE Two-Column Report)
-4. EduPulse_Presentation.pptx (10-Slide Dark-Navy Widescreen Defense Deck)
-5. EduCluster_ML_Presentation.pptx (Synchronized Defense Deck)
+3. EduPulse_Presentation.pptx (10-Slide Dark-Navy Widescreen Defense Deck)
 """
 
 import os
@@ -1278,11 +1276,9 @@ def generate_docx():
         r_ref.font.name = 'Times New Roman'
         r_ref.font.size = Pt(8.0)
 
-    # Save to PROJECT_REPORT.docx and IEEE_Final_Project_Report.docx
+    # Save to PROJECT_REPORT.docx
     doc.save("PROJECT_REPORT.docx")
-    doc.save("IEEE_Final_Project_Report.docx")
     print(f"✓ PROJECT_REPORT.docx generated successfully ({os.path.getsize('PROJECT_REPORT.docx'):,} bytes).")
-    print(f"✓ IEEE_Final_Project_Report.docx generated successfully ({os.path.getsize('IEEE_Final_Project_Report.docx'):,} bytes).")
 
 
 # ==============================================================================
@@ -1782,11 +1778,9 @@ def generate_pptx():
         "Thank you, and I look forward to your questions."
     )
 
-    # Save to both EduPulse_Presentation.pptx and EduCluster_ML_Presentation.pptx
+    # Save to EduPulse_Presentation.pptx
     prs.save("EduPulse_Presentation.pptx")
-    prs.save("EduCluster_ML_Presentation.pptx")
     print(f"✓ EduPulse_Presentation.pptx generated successfully ({os.path.getsize('EduPulse_Presentation.pptx'):,} bytes).")
-    print(f"✓ EduCluster_ML_Presentation.pptx generated successfully ({os.path.getsize('EduCluster_ML_Presentation.pptx'):,} bytes).")
 
 
 # ==============================================================================
@@ -1797,9 +1791,9 @@ def convert_docx_to_pdf():
     docx_file = Path("PROJECT_REPORT.docx").resolve()
     pdf_file = Path("PROJECT_REPORT.pdf").resolve()
     
-    ps_script = Path("export_pdf.ps1").resolve()
-    if not ps_script.exists():
-        ps_content = """param([string]$DocxPath, [string]$PdfPath)
+    import tempfile
+    with tempfile.NamedTemporaryFile("w", suffix=".ps1", delete=False, encoding="utf-8") as tf:
+        tf.write("""param([string]$DocxPath, [string]$PdfPath)
 $Word = New-Object -ComObject Word.Application
 $Word.Visible = $false
 try {
@@ -1811,16 +1805,22 @@ try {
     Write-Error $_.Exception.Message
 } finally {
     try { $Word.Quit() } catch {}
-    [System.Runtime.Interopservices.Marshal]::ReleaseComObject($Word) | Out-Null
+    [System.Runtime.InteropServices.Marshal]::ReleaseComObject($Word) | Out-Null
     [System.GC]::Collect()
     [System.GC]::WaitForPendingFinalizers()
 }
-"""
-        with open(ps_script, "w", encoding="utf-8") as f:
-            f.write(ps_content)
+""")
+        tmp_script = tf.name
 
-    cmd = ["powershell", "-ExecutionPolicy", "Bypass", "-File", str(ps_script), "-DocxPath", str(docx_file), "-PdfPath", str(pdf_file)]
-    res = subprocess.run(cmd, capture_output=True, text=True)
+    try:
+        cmd = ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", tmp_script, "-DocxPath", str(docx_file), "-PdfPath", str(pdf_file)]
+        res = subprocess.run(cmd, capture_output=True, text=True)
+    finally:
+        try:
+            os.remove(tmp_script)
+        except OSError:
+            pass
+
     if pdf_file.exists():
         print(f"✓ PROJECT_REPORT.pdf generated successfully ({pdf_file.stat().st_size:,} bytes).")
     else:
