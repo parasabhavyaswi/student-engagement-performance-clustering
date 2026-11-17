@@ -330,37 +330,52 @@ def predict_learning_path(
 ) -> Dict[str, Any]:
     """
     Given a student's raw 16-feature vector:
-    1. Standardizes features with fitted StandardScaler.
-    2. Determines nearest K-Means centroid.
-    3. Computes Euclidean distances to all centroids and softmax confidence score.
-    4. Returns structured learning path, 4-stage roadmap, and backward-compatible aliases.
+    1. Standardizes features with the pre-fitted StandardScaler (no separate scaler fitted).
+    2. Determines nearest K-Means centroid strictly via Euclidean distance:
+       k* = argmin_k ||z - μ_k||_2.
+    3. Computes the actual Euclidean centroid distance d = ||z - μ_{k*}||_2.
+    4. Calculates a mathematically defined similarity score via inverse Euclidean distance:
+       s = 1.0 / (1.0 + d) * 100%, avoiding misleading pseudo-probabilities.
+    5. Assigns risk level and structured 4-stage roadmap based on assigned persona.
     """
-    # Standardize
+    # -------------------------------------------------------------------------
+    # Feature Scaling Verification (Requirement 3)
+    # -------------------------------------------------------------------------
+    # Ensure input is a 2D float array matching the 16 engineered features
+    if isinstance(feature_vector_raw, list):
+        feature_vector_raw = np.array(feature_vector_raw, dtype=np.float64).reshape(1, -1)
+    elif isinstance(feature_vector_raw, pd.DataFrame):
+        feature_vector_raw = feature_vector_raw.values.astype(np.float64)
+
+    assert feature_vector_raw.shape[1] == 16, f"Expected 16 features, got {feature_vector_raw.shape[1]}"
+    assert hasattr(scaler, "mean_") and hasattr(scaler, "scale_"), "StandardScaler must be pre-fitted."
+
+    # Reuse the exact fitted scaler without refitting
     vec_scaled = scaler.transform(feature_vector_raw)
 
-    # Distances to all centroids
+    # -------------------------------------------------------------------------
+    # Centroid Distance & Nearest Cluster Assignment (Requirement 2)
+    # -------------------------------------------------------------------------
     centroids = kmeans_model.cluster_centers_  # shape: (4, 16)
     distances = np.linalg.norm(centroids - vec_scaled, axis=1)
 
-    # Predicted cluster
+    # Deterministic nearest-centroid assignment
     predicted_cluster = int(np.argmin(distances))
+    actual_distance = float(distances[predicted_cluster])
 
-    # Softmax confidence score over negative distances
-    # tau (temperature) = 2.0 for soft pedagogical probabilities
-    tau = 2.0
-    exp_neg_dist = np.exp(-distances / tau)
-    confidence_probs = exp_neg_dist / np.sum(exp_neg_dist)
-    confidence_score = float(confidence_probs[predicted_cluster] * 100.0)
+    # Mathematically defined distance similarity: s = 1 / (1 + d)
+    # Range is (0, 100%], where d=0 yields 100% exact centroid alignment.
+    similarity_score = float((1.0 / (1.0 + actual_distance)) * 100.0)
 
-    # Retrieve learning path metadata
+    # Retrieve learning path metadata for the assigned persona
     path_info = LEARNING_PATHS.get(predicted_cluster, LEARNING_PATHS[1]).copy()
 
-    # Distance breakdown
+    # Exact distance and similarity breakdown across all 4 centroids
     distance_breakdown = {
         int(c): {
             "name": LEARNING_PATHS[c]["persona_name"],
             "distance": float(distances[c]),
-            "probability": float(confidence_probs[c] * 100.0)
+            "similarity": float((1.0 / (1.0 + distances[c])) * 100.0)
         }
         for c in range(len(centroids))
     }
@@ -376,12 +391,15 @@ def predict_learning_path(
         "badge_border": path_info.get("badge_border", "#3B82F6"),
         "badge_bg": path_info.get("badge_bg", "rgba(59, 130, 246, 0.15)"),
         "tagline": path_info.get("tagline", ""),
+        # Risk category is strictly based on the assigned persona
         "risk_level": path_info.get("risk_level", "Standard"),
-        "confidence": confidence_score,
-        "distance_to_centroid": float(distances[predicted_cluster]),
+        # Actual centroid distance
+        "distance_to_centroid": actual_distance,
+        # Mathematically defined similarity metric
+        "similarity_score": similarity_score,
+        "confidence": similarity_score,  # backward compatibility alias
         "all_distances": distance_breakdown,
         "roadmap": roadmap_list,
-        # Alias pointing to roadmap for backward compatibility
         "action_plan": roadmap_list,
         "summary": path_info.get("summary", ""),
         "vector_scaled": vec_scaled

@@ -299,13 +299,33 @@ def load_and_preprocess_data(
     if len(df_raw) != 14003 and not all(f.exists() for f in required_raw_files):
         df_raw = generate_deterministic_oulad(output_dir=raw_dir, n_samples=14003, random_state=42)
 
+    # -------------------------------------------------------------------------
+    # Target Leakage Prevention & Feature Isolation (Requirement 4)
+    # -------------------------------------------------------------------------
+    # Strictly verify that TARGET_COLUMN ('final_result') is excluded from feature set
+    assert TARGET_COLUMN not in FEATURE_NAMES, (
+        f"CRITICAL TARGET LEAKAGE: '{TARGET_COLUMN}' detected in FEATURE_NAMES! "
+        "Ground truth labels must never influence unsupervised cluster formation."
+    )
+    assert len(FEATURE_NAMES) == 16, f"Expected exactly 16 features, got {len(FEATURE_NAMES)}"
+
     # Isolate feature matrix X from ground-truth target y_true (Zero label leakage)
     X = df_raw[FEATURE_NAMES].values.astype(np.float64)
     y_true = df_raw[TARGET_COLUMN].copy()
 
-    # Standardize features using StandardScaler (mu = 0, sigma = 1)
+    # Verify no target data leaked into X
+    assert X.shape[1] == 16, f"Feature matrix X must have 16 columns, got {X.shape[1]}"
+
+    # -------------------------------------------------------------------------
+    # Feature Scaling Verification (Requirement 3)
+    # -------------------------------------------------------------------------
+    # Fit a single StandardScaler on the 16 numerical training features (mu = 0, sigma = 1)
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
+
+    # Verify scaling properties
+    assert hasattr(scaler, "mean_") and hasattr(scaler, "scale_"), "StandardScaler must be properly fitted."
+    assert len(scaler.mean_) == 16, "StandardScaler mean vector must match 16 features."
 
     return df_raw, X_scaled, scaler, FEATURE_NAMES, y_true
 

@@ -524,13 +524,13 @@ with st.sidebar:
     prediction_result = predict_learning_path(raw_sim_vector, scaler, km_model)
     sim_pca_coords = pca_model.transform(prediction_result["vector_scaled"])[0]
 
-    # Live Prediction Pill (Fix 2: Instant Feedback in Sidebar)
+    # Live Prediction Pill (Fix 2: Actual Centroid Distance & Reliable Metric)
     pill_color = prediction_result.get("color", "#3B82F6")
     pill_bg = prediction_result.get("badge_bg", "rgba(59, 130, 246, 0.15)")
     c_id = prediction_result.get("cluster_id", 0)
     s_name = prediction_result.get("short_name") or prediction_result.get("persona") or f"Cluster {c_id}"
-    conf = prediction_result.get("confidence", 0.0)
     dist = prediction_result.get("distance_to_centroid", 0.0)
+    sim_pct = prediction_result.get("similarity_score", prediction_result.get("confidence", 0.0))
     risk = prediction_result.get("risk_level", "Standard")
 
     sidebar_pill_html = f"""
@@ -542,12 +542,12 @@ with st.sidebar:
             <span style="background:{pill_bg}; border:1px solid {pill_color}; color:#ffffff; padding:0.35rem 0.65rem; border-radius:6px; font-weight:700; font-size:0.82rem;">
                 <span style="color:{pill_color};">●</span> Cluster {c_id}: {s_name}
             </span>
-            <span style="font-size:1.05rem; font-weight:800; color:{pill_color};">
-                {conf:.1f}%
+            <span style="font-size:1.05rem; font-weight:800; color:{pill_color};" title="Euclidean distance to nearest centroid: d = ||z - μ||₂">
+                d = {dist:.2f}
             </span>
         </div>
         <div style="font-size:0.72rem; color:#64748b; margin-top:0.45rem;">
-            Centroid Dist: <b style="color:#cbd5e1;">{dist:.2f}</b> &bull; {risk}
+            Centroid Dist: <b style="color:#cbd5e1;">{dist:.2f}</b> (Sim: {sim_pct:.1f}%) &bull; {risk}
         </div>
     </div>
     """
@@ -778,7 +778,7 @@ with tab2:
     v_col1, v_col2 = st.columns([1, 1], gap="medium")
 
     with v_col1:
-        st.markdown("<h4 style='color:#f8fafc; margin-bottom:0.3rem;'>Optimal-k Model Evaluation (k = 2..8)</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 style='color:#f8fafc; margin-bottom:0.3rem;'>K-Means Model Evaluation & Cluster Selection (k = 2..8)</h4>", unsafe_allow_html=True)
         st.markdown("<p style='font-size:0.82rem; color:#94a3b8; margin-bottom:0.8rem;'>Dual-Axis Sweep: Inertia (Elbow Criterion) vs Silhouette Coefficient</p>", unsafe_allow_html=True)
 
         # Dual Axis Plot: Inertia (Left) & Silhouette (Right)
@@ -808,13 +808,13 @@ with tab2:
             secondary_y=True
         )
 
-        # Vertical callout marker at k=4
+        # Vertical callout marker at k=4 (Fix 1: Pedagogical Interpretability Annotation)
         fig_sweep.add_vline(
             x=4,
             line_width=2,
             line_dash="dash",
             line_color="#f59e0b",
-            annotation_text="Optimal k = 4 (Pedagogical Alignment)",
+            annotation_text="Selected K=4 – Pedagogical Interpretability",
             annotation_position="top left",
             annotation_font=dict(color="#f59e0b", size=11)
         )
@@ -832,6 +832,18 @@ with tab2:
         fig_sweep.update_yaxes(title="Mean Silhouette Coefficient", secondary_y=True)
 
         st.plotly_chart(fig_sweep, use_container_width=True)
+
+        # Short explanation: Pedagogical granularity of K=4 despite higher silhouette at K=2 (Fix 1)
+        st.markdown("""
+        <div style="background:#111827; border:1px solid #1e293b; border-left:3px solid #f59e0b; border-radius:8px; padding:0.75rem 1rem; margin-top:0.6rem; margin-bottom:0.9rem;">
+            <div style="font-size:0.75rem; font-weight:700; color:#f59e0b; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.25rem;">
+                Cluster Selection Rationale (K = 4)
+            </div>
+            <div style="font-size:0.82rem; color:#cbd5e1; line-height:1.45;">
+                Although <b>K = 2</b> achieves a higher mathematical silhouette score (<b>0.5675</b> vs. <b>0.4212</b> for K = 4), a two-cluster split merely divides students into coarse active vs. inactive groups. <b>K = 4</b> was selected for <b>pedagogical interpretability</b> because it provides actionable, detailed educational segmentation—differentiating High-Achievers, Steady Learners, Deadline Crammers, and At-Risk students—enabling targeted four-week personalized learning roadmaps while maintaining strong cluster separation (Calinski-Harabasz score = 19,873.1).
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
         # Metric Table for k=2..8 (Fix 1: Dark HTML Table, Zero White Background)
         st.markdown("<p style='font-size:0.82rem; font-weight:700; color:#cbd5e1; margin-top:0.4rem; margin-bottom:0.2rem;'>Cluster Separation Index Comparison</p>", unsafe_allow_html=True)
@@ -923,8 +935,8 @@ with tab3:
             <div style="font-size:1.35rem; font-weight:800; color:#f8fafc; display:flex; align-items:center; gap:0.6rem; margin-top:0.15rem;">
                 <span>{pred_meta['icon']}</span>
                 <span>Cluster {pred_c_id}: {prediction_result['persona_name']}</span>
-                <span style="background:{p_badge_bg}; border:1px solid {p_color}; color:#ffffff; font-size:0.78rem; font-weight:700; padding:0.2rem 0.6rem; border-radius:6px;">
-                    {prediction_result['confidence']:.1f}% Match
+                <span style="background:{p_badge_bg}; border:1px solid {p_color}; color:#ffffff; font-size:0.78rem; font-weight:700; padding:0.2rem 0.6rem; border-radius:6px;" title="Euclidean distance to cluster centroid: d = ||z - μ||₂ (Similarity: {prediction_result.get('similarity_score', prediction_result['confidence']):.1f}%)">
+                    Centroid Dist: d = {prediction_result['distance_to_centroid']:.2f}
                 </span>
             </div>
         </div>
