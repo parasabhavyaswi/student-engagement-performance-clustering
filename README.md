@@ -1,5 +1,6 @@
 # EduCluster ML: K-Means Clustering of Student Engagement and Performance Data for Personalized Learning Path Design
 
+[![Live Web App](https://img.shields.io/badge/Live%20App-Online%20(Cloudflare)-success?logo=cloudflare)](https://applicant-medline-uri-burns.trycloudflare.com)
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://student-engagement-performance-clustering.streamlit.app)
 [![GitHub Repository](https://img.shields.io/badge/GitHub-student--engagement--performance--clustering-181717?logo=github)](https://github.com/parasabhavyaswi/student-engagement-performance-clustering)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
@@ -15,7 +16,8 @@
 
 | Service | Access Link | Description |
 | :--- | :--- | :--- |
-| **Live Web App (Streamlit Cloud)** | **[student-engagement-performance-clustering.streamlit.app](https://student-engagement-performance-clustering.streamlit.app)** | Production interactive dark-mode analytics telemetry dashboard |
+| **Instant Live Web App (Worldwide)** | **[applicant-medline-uri-burns.trycloudflare.com](https://applicant-medline-uri-burns.trycloudflare.com)** | **Live now** — production interactive dark-mode analytics telemetry dashboard |
+| **Streamlit Community Cloud** | **[student-engagement-performance-clustering.streamlit.app](https://student-engagement-performance-clustering.streamlit.app)** | Permanent Streamlit Cloud deployment target |
 | **GitHub Repository** | **[parasabhavyaswi/student-engagement-performance-clustering](https://github.com/parasabhavyaswi/student-engagement-performance-clustering)** | Source code, models, datasets, tests, and deliverables |
 | **Local Deployment** | `http://localhost:8501` | Run locally via `streamlit run app.py` |
 | **Docker Container** | `docker run -p 8501:8501 <image>` | Containerized deployment using included `Dockerfile` |

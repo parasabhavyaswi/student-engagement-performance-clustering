@@ -568,7 +568,7 @@ def generate_deck():
                    "• Implement cumulative weekly in-semester snapshots with temporal Transformer models to track real-time transitions and evaluate retention gains via live university RCTs.")
 
     add_light_card(s11, 0.92, 5.55, 5.60, 1.35, "Deployment & Repository Links",
-                   "• Cloud Deployment: https://student-engagement-performance-clustering.streamlit.app\n"
+                   "• Live Public Web App: https://applicant-medline-uri-burns.trycloudflare.com\n"
                    "• Local Web Dashboard: http://localhost:8501\n"
                    "• GitHub Repository: https://github.com/parasabhavyaswi/student-engagement-performance-clustering",
                    border_col=COLOR_ORANGE)
