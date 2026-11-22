@@ -1,0 +1,118 @@
+{
+  "0": {
+    "archetype_id": 0,
+    "name": "Steady Learners",
+    "badge_color": "#43A047",
+    "risk_level": "Very Low",
+    "description": "High platform engagement, solid scores, and exceptionally early assessment submissions (early planners).",
+    "mean_clicks": 3504.771998875457,
+    "median_clicks": 3054.0,
+    "mean_days": 110.00843407365758,
+    "median_days": 104.0,
+    "mean_score": 78.57105450464321,
+    "median_score": 81.25,
+    "mean_delay": -63.2480680433801,
+    "median_delay": -59.666666666666664,
+    "count": 3557,
+    "percentage": 13.92,
+    "final_result_dist": {
+      "Pass": 0.5626,
+      "Distinction": 0.1954,
+      "Fail": 0.1279,
+      "Withdrawn": 0.1141
+    },
+    "scaled_centroid": [
+      0.9681573812518655,
+      0.7561180309025666,
+      0.4881262389834429,
+      -2.0662008243493126
+    ]
+  },
+  "1": {
+    "archetype_id": 1,
+    "name": "Deadline Crammers",
+    "badge_color": "#FB8C00",
+    "risk_level": "Moderate",
+    "description": "Selective low day-to-day activity, high intensity bursts right around assignment due dates, satisfactory scores.",
+    "mean_clicks": 670.8376879599019,
+    "median_clicks": 593.0,
+    "mean_days": 40.92854857630372,
+    "median_days": 40.0,
+    "mean_score": 76.76991566862665,
+    "median_score": 76.21052631578948,
+    "mean_delay": -4.542095363608108,
+    "median_delay": 0.0,
+    "count": 9377,
+    "percentage": 36.71,
+    "final_result_dist": {
+      "Pass": 0.4841,
+      "Fail": 0.2089,
+      "Withdrawn": 0.2074,
+      "Distinction": 0.0996
+    },
+    "scaled_centroid": [
+      -0.3837067970153309,
+      -0.5439815008507743,
+      0.38427601536856,
+      0.25584863031151345
+    ]
+  },
+  "2": {
+    "archetype_id": 2,
+    "name": "At-Risk Learners",
+    "badge_color": "#E53935",
+    "risk_level": "Critical",
+    "description": "Minimal platform interaction, low assessment scores, frequent late submissions, and high risk of dropout/failure.",
+    "mean_clicks": 451.6147375504711,
+    "median_clicks": 320.0,
+    "mean_days": 30.448014804845222,
+    "median_days": 24.0,
+    "mean_score": 48.04643204040583,
+    "median_score": 51.0,
+    "mean_delay": 0.986411613472515,
+    "median_delay": 1.1818181818181819,
+    "count": 5944,
+    "percentage": 23.27,
+    "final_result_dist": {
+      "Fail": 0.4564,
+      "Withdrawn": 0.3316,
+      "Pass": 0.2116,
+      "Distinction": 0.0003
+    },
+    "scaled_centroid": [
+      -0.9054004863841411,
+      -0.7426440715080594,
+      -1.2952410144917657,
+      0.4759697482326848
+    ]
+  },
+  "3": {
+    "archetype_id": 3,
+    "name": "High-Achievers",
+    "badge_color": "#1E88E5",
+    "risk_level": "Low",
+    "description": "Consistently engaged, regular study cadence, strong assessment mastery, and proactive milestone completion.",
+    "mean_clicks": 2668.880923815237,
+    "median_clicks": 2196.0,
+    "mean_days": 124.27939412117577,
+    "median_days": 114.0,
+    "mean_score": 76.33606939045812,
+    "median_score": 78.0,
+    "mean_delay": -3.01978497199328,
+    "median_delay": -0.7857142857142857,
+    "count": 6668,
+    "percentage": 26.1,
+    "final_result_dist": {
+      "Pass": 0.6816,
+      "Distinction": 0.2085,
+      "Fail": 0.0739,
+      "Withdrawn": 0.036
+    },
+    "scaled_centroid": [
+      0.8311074722671841,
+      1.0237190715905538,
+      0.35714070032157086,
+      0.3169661841902247
+    ]
+  }
+}

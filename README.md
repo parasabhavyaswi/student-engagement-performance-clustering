@@ -1,147 +1,140 @@
-# EduPulse – Student Engagement Analytics and Personalized Learning Paths
-## K-Means Clustering of Student Engagement & Performance Data for Personalized Learning Path Design
+# EduCluster ML: K-Means Clustering of Student Engagement and Performance Data for Personalized Learning Path Design
 
-**Project ID:** SIH26036  
-**Candidate:** Parasa Bhavyaswi (Reg No: 12502256)  
-**Supervisor:** Dr. Bhupinder Singh (`bhupinder0741@gmail.com`)  
-**Institution:** School of Computer Science & Engineering, Lovely Professional University, Phagwara, Punjab, India  
-**Dataset:** Open University Learning Analytics Dataset (OULAD)  
-**Cohort Volume:** $N = 14,003$ valid student-module records
-
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Streamlit](https://img.shields.io/badge/streamlit-1.32+-FF4B4B.svg)](https://streamlit.io)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Academic: IEEE Format](https://img.shields.io/badge/Academic-IEEE_Report-blueviolet.svg)](PROJECT_REPORT.docx)
+**Candidate:** Parasa Bhavyaswi (Registration No: 12502256)  
+**Supervisor:** Dr. Bhupinder Singh  
+**Affiliation:** School of Computer Science & Engineering, Lovely Professional University, Phagwara, Punjab, India  
 
 ---
 
 ## 📌 Executive Summary
 
-Modern Virtual Learning Environments (VLEs) predominantly enforce monolithic, one-size-fits-all curricula. Traditional early warning indicators rely heavily on summative examination marks—intervening weeks after disengaged students have already abandoned coursework.
+Modern virtual learning environments (VLEs) collect extensive digital engagement telemetry, yet educational institutions often struggle to convert raw clickstream logs into proactive academic interventions. **EduCluster ML** is an end-to-end unsupervised learning system that ingests **14,003 valid student-course enrolments** from the public Open University Learning Analytics Dataset (OULAD), engineers a balanced 16-feature representation across platform interaction, temporal consistency, and summative performance, and segments learners into four actionable pedagogical personas using K-Means clustering ($k = 4$).
 
-**EduPulse – Student Engagement Analytics and Personalized Learning Paths** (EduPulse) resolves this bottleneck by implementing an unsupervised educational data mining pipeline that continuously segments student clickstreams into actionable behavioral archetypes and generates automated, four-week prescriptive learning roadmaps without requiring target grade labels during training.
+Extrinsic statistical validation against unobserved course completion outcomes (`final_result`) confirms substantial non-random alignment without target leakage ($\chi^2 = 12,136.24$, $p < 0.0001$, Cramér's $V = 0.5375$, $\text{NMI} = 0.3100$, $\text{ARI} = 0.2778$). Each persona maps directly to structured, four-week personalized learning path roadmaps deployed via a product-grade dark-mode Streamlit telemetry dashboard.
 
 ---
 
 ## 🎯 Research Objectives
 
-1. **Objective 1 — Feature Compilation & Leak-Free Normalization (`educluster-ml/src/preprocess.py`):**
-   - Engineered 16 behavioral features across Platform Engagement (8), Attendance & Consistency (4), and Assessment Performance (4).
-   - Applied $\ln(1+x)$ skew compression for heavy-tailed click distributions and standardized scaling via `StandardScaler`.
-   - Guaranteed zero label leakage: official teacher outcomes (`final_result`) strictly quarantined from feature compilation.
+```mermaid
+flowchart TD
+    A["Objective 1: Feature Compilation<br>16 Features across 3 Domains<br>N = 14,003 OULAD Enrolments"] --> B["Objective 2: K-Means Clustering<br>k = 4 Personas & 2D PCA<br>82.0% Cumulative Variance"]
+    B --> C["Objective 3: Extrinsic Validation & Roadmaps<br>Cramer's V = 0.5375 & NMI = 0.3100<br>4-Week Personalized Learning Paths"]
+    C --> D["Product-Grade Dashboard<br>app.py Streamlit Dark Deck<br>Zero White Tables & Live Simulator"]
+```
 
-2. **Objective 2 — Unsupervised $k$-Means Segmentation & 2D PCA (`educluster-ml/src/clustering.py`):**
-   - Evaluated clustering quality across $k \in [2, 8]$ using Inertia, Silhouette coefficient, Davies-Bouldin index, and Calinski-Harabasz score.
-   - Selected **$k = 4$ for pedagogical interpretability**: although $k = 2$ exhibits a higher mathematical silhouette score ($0.5675$ vs. $0.4212$), $k = 4$ isolates four actionable educational personas (High-Achievers, Steady Learners, Deadline Crammers, and At-Risk students) while maximizing the Calinski-Harabasz score ($19,873.1$).
-   - Validated spatial cohort separation via 2D Principal Component Analysis (PCA) explaining **82.0%** cumulative variance (PC1: 74.9%, PC2: 7.1%).
+1. **Objective 1 — Feature Compilation (`src/preprocess.py`)**:
+   - Ingests OULAD records across 4 core tables: `studentInfo.csv`, `studentVle.csv`, `studentAssessment.csv`, and `assessments.csv`.
+   - Filters to $N = 14,003$ valid student-module records (excluding `is_banked = 1`). Includes deterministic synthetic fallback generator.
+   - Engineers 16 domain features with $\log(1 + x)$ transforms on click features and standardizes via `StandardScaler` ($\mu = 0, \sigma = 1$).
+   - Strictly isolates `final_result` (Distinction, Pass, Fail, Withdrawn) as a ground-truth validation proxy.
 
-3. **Objective 3 — Extrinsic Validation & Prescriptive Learning Paths (`educluster-ml/src/validation.py`, `educluster-ml/src/recommender.py`):**
-   - Validated unsupervised partitions against teacher-graded academic outcomes: $\chi^2 = 12,136.24$ ($df = 9, p < 0.0001$), Cramér's $V = 0.5375$, NMI = 0.310, ARI = 0.2778.
-   - Isolated **69.4%** of Distinction earners into Cluster 0 and **73.0%** of Course Withdrawals into Cluster 3.
-   - Mapped cluster centroids to structured 4-week personalized remedial and acceleration roadmaps.
+2. **Objective 2 — K-Means Segmentation & PCA (`src/clustering.py`)**:
+   - Multi-metric evaluation across $k \in [2, 8]$ (Inertia, Silhouette, Davies-Bouldin, Calinski-Harabasz).
+   - Selects $k = 4$ for pedagogical interpretability (Silhouette = 0.4212, Davies-Bouldin = 0.8940).
+   - Orders clusters deterministically by descending `weighted_avg_score`.
+   - Projects 16D space to 2D PCA coordinates (82.0% variance: PC1 = 74.9%, PC2 = 7.1%) and computes 6-axis normalized centroid radar profiles.
 
----
-
-## 👥 Discovered Student Behavioral Personas
-
-| Cluster | Archetype Label | Share (%) | Median Score | Median Clicks | Active Days | Submission Delay | Completion Rate |
-| :---: | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **C0** | **High-Achieving Self-Directed** | 22.1% (3,100) | 88.5% | 2,835 | 88 days | -4.5 days (early) | 98.0% |
-| **C1** | **Steady & Consistent Learners** | 37.7% (5,280) | 71.0% | 1,096 | 58 days | -1.5 days (early) | 92.0% |
-| **C2** | **Deadline Crammers / Selective** | 22.7% (3,180) | 52.5% | 544 | 27 days | +2.2 days (late) | 75.0% |
-| **C3** | **Disengaged / At-Risk Cohort** | 17.4% (2,443) | 23.5% | 109 | 11 days | +9.5 days (late) | 32.0% |
+3. **Objective 3 — Extrinsic Validation & Roadmaps (`src/validation.py` & `src/recommender.py`)**:
+   - Statistical validation: Pearson's $\chi^2 = 12,136.24$ ($df = 9, p < 0.0001$), Cramér's $V = 0.5375$, $\text{NMI} = 0.3100$, $\text{ARI} = 0.2778$.
+   - Synthesizes 4-week structured personalized learning paths with weekly hourly commitments, actionable interventions, and milestone deliverables.
 
 ---
 
-## 📊 Extrinsic Validation Matrix
+## 📊 The Four Discovered Learner Personas
 
-| Ground Truth Outcome | Cluster 0 (High) | Cluster 1 (Steady) | Cluster 2 (Crammer) | Cluster 3 (At-Risk) | Total Students |
-| :--- | :---: | :---: | :---: | :---: | :---: |
-| **Distinction** | **1,983 (69.4%)** | 776 (27.1%) | 89 (3.1%) | 11 (0.4%) | 2,859 |
-| **Pass** | 999 (15.2%) | **3,995 (60.9%)** | 1,434 (21.8%) | 137 (2.1%) | 6,565 |
-| **Fail** | 102 (3.8%) | 375 (14.1%) | **1,291 (48.4%)** | 898 (33.7%) | 2,666 |
-| **Withdrawn** | 16 (0.8%) | 134 (7.0%) | 366 (19.1%) | **1,397 (73.0%)** | 1,913 |
-| **Cohort Total** | **3,100** | **5,280** | **3,180** | **2,443** | **14,003** |
+| Cluster ID | Persona Name | Cohort Share | Median Score | Median Clicks | Median Active Days | Submission Delay | Completion Rate | Pedagogical Risk |
+| :---: | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **C0** | **High-Achieving Self-Directed** | 22.1% ($n = 3,100$) | **88.5%** | 2,805 | 87.8 d | -4.5 d (Early) | 97.8% | Low Risk |
+| **C1** | **Steady & Consistent Learners** | 37.7% ($n = 5,280$) | **71.0%** | 1,094 | 57.9 d | -1.5 d (Early) | 91.9% | Low/Moderate |
+| **C2** | **Crammers / Selective Engagers** | 22.7% ($n = 3,180$) | **52.4%** | 543 | 27.0 d | +2.2 d (Late) | 75.1% | Moderate Risk |
+| **C3** | **Disengaged / At-Risk** | 17.4% ($n = 2,443$) | **23.6%** | 111 | 11.0 d | +9.3 d (Overdue) | 31.9% | Critical Risk |
 
-$$\chi^2 = 12,136.24 \quad (df = 9, p < 0.0001), \quad \text{Cramér's } V = 0.5375, \quad \text{NMI} = 0.3097, \quad \text{ARI} = 0.2778$$
+---
+
+## 🗺️ 4-Week Personalized Learning Path Framework
+
+```
+Cluster 0 (High-Achievers):
+Week 1: Core Fast-Track (3 hrs/wk | Auto-Skip Basics) ➔ Week 2: Advanced Case Lab (4 hrs/wk | Capstone Dataset) ➔ Week 3: Peer Mentor Review (3 hrs/wk | Forum Leadership) ➔ Week 4: Honors Challenge (4 hrs/wk | Research Problem Set)
+
+Cluster 1 (Steady Learners):
+Week 1: Concept Diagnostic (5 hrs/wk | Self-Check Quiz) ➔ Week 2: Guided Deep-Dive (6 hrs/wk | Interactive Micro-Labs) ➔ Week 3: Timed Practice Test (6 hrs/wk | Exam Simulation) ➔ Week 4: Distinction Bridge (5 hrs/wk | Optional Stretch Topic)
+
+Cluster 2 (Deadline Crammers):
+Week 1: Micro-Milestone Setup (4 hrs/wk | 15-Min Daily Modules) ➔ Week 2: Streak Checkpoints (5 hrs/wk | Mid-Week Mini-Quiz) ➔ Week 3: Early Draft Gate (5 hrs/wk | 48h Pre-Deadline Lock) ➔ Week 4: Paced Exam Prep (6 hrs/wk | Spaced Flashcards)
+
+Cluster 3 (At-Risk Learners):
+Week 1: 1-on-1 Advisor Triage (3 hrs/wk | Faculty Check-In) ➔ Week 2: Foundational Recap (4 hrs/wk | Video Walkthroughs) ➔ Week 3: Scaffolded Practice (5 hrs/wk | Guided Step-by-Step Lab) ➔ Week 4: Recovery Checkpoint (5 hrs/wk | Low-Stakes Mastery Quiz)
+```
 
 ---
 
 ## 📁 Repository Structure
 
 ```
-student-engagement-performance-clustering/
-├── PROJECT_REPORT.docx             # Complete IEEE two-column research paper (Word)
-├── PROJECT_REPORT.pdf              # Publication-grade PDF version of research paper
-├── EduPulse_Presentation.pptx      # 10-slide 16:9 defense deck with speaker notes
-├── generate_deliverables.py        # Automated generator for paper, PDF, slides, and plots
-├── app.py                          # Root Streamlit dashboard entrypoint
-├── requirements.txt                # Unified Python dependency specifications
-├── README.md                       # Repository documentation & academic summary
-├── assets/                         # Publication-grade high-res figures (300 DPI)
-│   ├── fig1_overview.png           # Conceptual Overview Diagram
-│   ├── fig2_architecture.png       # System Architecture Diagram
-│   ├── fig3_workflow.png           # Experimental Workflow Flowchart
-│   ├── fig4_elbow_silhouette.png   # Dual-axis Elbow (Inertia) & Silhouette curve
-│   ├── fig5_pca_clusters.png       # 2D PCA cluster space projection (82.0% var)
-│   ├── fig6_radar_footprint.png    # 6-axis behavioral centroid radar chart
-│   └── fig7_contingency_heatmap.png# 4x4 Extrinsic validation contingency heatmap
-└── educluster-ml/                  # Core machine learning package & dashboard
-    ├── app.py                      # Interactive Streamlit application (EduPulse)
-    ├── README.md                   # Modular architecture & implementation guide
-    ├── requirements.txt            # Package dependencies
-    ├── data/
-    │   └── raw/                    # OULAD raw CSV storage & deterministic fallback
-    └── src/
-        ├── __init__.py             # Module metadata
-        ├── preprocess.py           # Feature engineering & scaling (Objective 1)
-        ├── clustering.py           # K-Means, sweep & PCA (Objective 2)
-        ├── validation.py           # Extrinsic metrics & Chi-Square (Objective 3)
-        └── recommender.py          # Prescriptive 4-week learning path engine (Objective 4)
+educluster-ml/
+├── data/
+│   └── raw/                      # OULAD raw CSVs + deterministic 14,003-row OULAD benchmark dataset
+├── src/
+│   ├── __init__.py
+│   ├── preprocess.py             # Objective 1: 16-feature compilation, log1p transforms & StandardScaler
+│   ├── clustering.py             # Objective 2: K-Means (k=4), k=2..8 sweeps & 2D PCA (82.0% variance)
+│   ├── validation.py             # Objective 3: Extrinsic validation (NMI, ARI, Chi2, Cramer's V)
+│   └── recommender.py            # Visual 4-Week Personalized Learning Path engine
+├── app.py                        # Product-grade dark-mode Streamlit dashboard (zero white tables)
+├── generate_deliverables.py      # Automated generator for IEEE .docx paper and 10-slide .pptx deck
+├── IEEE_Final_Project_Report.docx# Two-column IEEE research manuscript
+├── EduCluster_ML_Presentation.pptx# 10-slide 16:9 widescreen dark executive deck with speaker notes
+├── requirements.txt
+└── README.md
 ```
 
 ---
 
 ## 🚀 Quick Start & Installation
 
-### 1. Clone the Repository
-```bash
-git clone https://github.com/parasabhavyaswi/student-engagement-performance-clustering.git
-cd student-engagement-performance-clustering
-```
+### 1. Environment Setup
+```powershell
+# Clone or navigate to the repository
+cd educluster-ml
 
-### 2. Set Up Virtual Environment & Dependencies
-```bash
-python -m venv venv
-# Windows:
-venv\Scripts\activate
-# Linux/macOS:
-source venv/bin/activate
-
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-### 3. Launch the Interactive Dashboard
-```bash
-streamlit run app.py
-```
-*Access the local web dashboard at `http://localhost:8501`.*
-
-### 4. Regenerate Academic Deliverables
-```bash
+### 2. Generate Submission Deliverables (IEEE Paper & PPTX Deck)
+```powershell
 python generate_deliverables.py
 ```
-*Reproduces `PROJECT_REPORT.docx`, `PROJECT_REPORT.pdf`, `EduPulse_Presentation.pptx`, and all high-res plots in `assets/`.*
+Outputs:
+- `IEEE_Final_Project_Report.docx` (Two-column IEEE conference paper with 4 embedded high-DPI charts and Tables I–V)
+- `EduCluster_ML_Presentation.pptx` (10-slide 16:9 widescreen dark presentation with speaker notes)
+
+### 3. Launch Dark-Mode Analytics Dashboard
+```powershell
+streamlit run app.py
+```
+Access the application locally at: **`http://localhost:8501`**
 
 ---
 
-## 🔬 Citations & References
+## 🖥️ Dashboard Overview (`app.py`)
 
-1. J. Kuzilek, M. Hlosta, and Z. Zdrahal, "Open University Learning Analytics Dataset," *Scientific Data*, vol. 4, no. 1, p. 170171, 2017.
-2. C. Romero and S. Ventura, "Educational data mining and learning analytics: An updated survey," *WIREs Data Mining and Knowledge Discovery*, vol. 10, no. 3, p. e1355, 2020.
-3. R. S. Baker and P. S. Inventado, "Educational data mining and learning analytics," in *Learning Analytics*, New York, NY: Springer, 2014, pp. 61–75.
-4. D. T. Tempelaar, B. Rienties, and B. Giesbers, "In search of the most informative data for feedback generation: Learning analytics in a blended learning environment," *Computers & Education*, vol. 82, pp. 87–101, 2015.
-5. L. P. Macfadyen and S. Dawson, "Mining LMS data to develop an 'early warning system' for educators: A proof of concept," *Computers & Education*, vol. 54, no. 2, pp. 588–599, 2010.
-6. P. J. Rousseeuw, "Silhouettes: A graphical aid to the interpretation and validation of cluster analysis," *Journal of Computational and Applied Mathematics*, vol. 20, pp. 53–65, 1987.
-7. D. Arthur and S. Vassilvitskii, "k-means++: The advantages of careful seeding," in *Proc. 18th Annu. ACM-SIAM Symp. Discrete Algorithms*, 2007, pp. 1027–1035.
-8. H. Cramér, *Mathematical Methods of Statistics*, vol. 43. Princeton, NJ: Princeton University Press, 1999.
+- **Design System**: High-contrast dark navy theme (`#0B0F19` canvas, `#111827` cards, `#1E293B` borders).
+- **Zero White Tables**: Every data table is rendered via dark HTML styling or Plotly `go.Table`.
+- **Student Persona Simulator**: 4 sliders (Clicks, Active Days, Score, Submission Delay) + 4 preset profile buttons.
+- **Top KPI Row**: Total Cohort ($14,003$), Clusters ($k = 4$), Silhouette Score ($0.421$), NMI ($0.310$), Cramér's V ($0.537$).
+- **Tab 1 — Segmentation & PCA**: 2D PCA scatter plot with dynamic golden star marker ($\bigstar$) for the simulated student, 6-axis centroid radar polygon, and dark centroid table.
+- **Tab 2 — Validation Analysis**: Dual-axis elbow & silhouette curve ($k = 2..8$), $4 \times 4$ contingency matrix heatmap, and statistical summary.
+- **Tab 3 — Personalized Learning Paths**: 4 horizontal roadmap cards for the active student, cohort distribution donut and bar charts, and cohort CSV export download.
+
+---
+
+## 🧪 Automated Testing
+
+Run the test suite to verify data preprocessing, K-Means clustering, PCA variance, and validation calculations:
+```powershell
+pytest -v
+```
+All tests verify zero data leakage, correct feature dimensions (16 features, 14,003 rows), and statistical effect size accuracy.

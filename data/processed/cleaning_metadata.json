@@ -1,0 +1,34 @@
+{
+  "initial_total_enrolments": 32593,
+  "total_student_enrolments": 32593,
+  "unique_students": 28785,
+  "unique_student_ids": 28785,
+  "valid_clustering_enrolments": 25546,
+  "total_excluded_enrolments": 7047,
+  "total_excluded_records": 7047,
+  "valid_percentage": 78.38,
+  "valid_enrolments_percentage": 78.38,
+  "excluded_percentage": 21.62,
+  "enrolments_with_zero_vle_clicks_retained": 15,
+  "total_zero_vle_enrolments_in_cohort": 3365,
+  "enrolments_without_vle_activity": 3365,
+  "excluded_reasons": {
+    "lacking_both_score_and_delay": 6750,
+    "lacking_valid_score_only": 23,
+    "lacking_valid_timed_delay_only": 274,
+    "no_assessments_submitted": 6750,
+    "neither_vle_nor_assessments": 3315
+  },
+  "excluded_by_final_result": {
+    "Withdrawn": 5594,
+    "Fail": 1432,
+    "Pass": 18,
+    "Distinction": 3
+  },
+  "valid_by_final_result": {
+    "Pass": 12343,
+    "Fail": 5620,
+    "Withdrawn": 4562,
+    "Distinction": 3021
+  }
+}
