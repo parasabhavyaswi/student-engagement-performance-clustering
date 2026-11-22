@@ -1,8 +1,24 @@
 # EduCluster ML: K-Means Clustering of Student Engagement and Performance Data for Personalized Learning Path Design
 
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://student-engagement-performance-clustering.streamlit.app)
+[![GitHub Repository](https://img.shields.io/badge/GitHub-student--engagement--performance--clustering-181717?logo=github)](https://github.com/parasabhavyaswi/student-engagement-performance-clustering)
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 **Candidate:** Parasa Bhavyaswi (Registration No: 12502256)  
-**Supervisor:** Dr. Bhupinder Singh  
+**Supervisor:** Dr. Bhupinder Singh, Professor  
 **Affiliation:** School of Computer Science & Engineering, Lovely Professional University, Phagwara, Punjab, India  
+
+---
+
+## 🌐 Live Cloud Deployment & Links
+
+| Service | Access Link | Description |
+| :--- | :--- | :--- |
+| **Live Web App (Streamlit Cloud)** | **[student-engagement-performance-clustering.streamlit.app](https://student-engagement-performance-clustering.streamlit.app)** | Production interactive dark-mode analytics telemetry dashboard |
+| **GitHub Repository** | **[parasabhavyaswi/student-engagement-performance-clustering](https://github.com/parasabhavyaswi/student-engagement-performance-clustering)** | Source code, models, datasets, tests, and deliverables |
+| **Local Deployment** | `http://localhost:8501` | Run locally via `streamlit run app.py` |
+| **Docker Container** | `docker run -p 8501:8501 <image>` | Containerized deployment using included `Dockerfile` |
 
 ---
 
@@ -45,10 +61,10 @@ flowchart TD
 
 | Cluster ID | Persona Name | Cohort Share | Median Score | Median Clicks | Median Active Days | Submission Delay | Completion Rate | Pedagogical Risk |
 | :---: | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **C0** | **High-Achieving Self-Directed** | 22.1% ($n = 3,100$) | **88.5%** | 2,805 | 87.8 d | -4.5 d (Early) | 97.8% | Low Risk |
-| **C1** | **Steady & Consistent Learners** | 37.7% ($n = 5,280$) | **71.0%** | 1,094 | 57.9 d | -1.5 d (Early) | 91.9% | Low/Moderate |
-| **C2** | **Crammers / Selective Engagers** | 22.7% ($n = 3,180$) | **52.4%** | 543 | 27.0 d | +2.2 d (Late) | 75.1% | Moderate Risk |
-| **C3** | **Disengaged / At-Risk** | 17.4% ($n = 2,443$) | **23.6%** | 111 | 11.0 d | +9.3 d (Overdue) | 31.9% | Critical Risk |
+| **C0** | **High-Achieving Self-Directed** | 22.4% ($n = 3,141$) | **88.3%** | 2,811 | 87.6 d | -4.5 d (Early) | 97.8% | Low Risk |
+| **C1** | **Steady & Consistent Learners** | 37.4% ($n = 5,240$) | **71.0%** | 1,088 | 58.0 d | -1.5 d (Early) | 91.9% | Low/Moderate |
+| **C2** | **Crammers / Selective Engagers** | 22.7% ($n = 3,185$) | **52.4%** | 543 | 27.0 d | +2.2 d (Late) | 75.1% | Moderate Risk |
+| **C3** | **Disengaged / At-Risk** | 17.4% ($n = 2,437$) | **23.6%** | 111 | 11.0 d | +9.3 d (Overdue) | 31.9% | Critical Risk |
 
 ---
 
@@ -56,16 +72,16 @@ flowchart TD
 
 ```
 Cluster 0 (High-Achievers):
-Week 1: Core Fast-Track (3 hrs/wk | Auto-Skip Basics) ➔ Week 2: Advanced Case Lab (4 hrs/wk | Capstone Dataset) ➔ Week 3: Peer Mentor Review (3 hrs/wk | Forum Leadership) ➔ Week 4: Honors Challenge (4 hrs/wk | Research Problem Set)
+Week 1: Core Fast-Track (Accelerated Pace) ➔ Week 2: Advanced Case Lab (Deep Inquiry) ➔ Week 3: Peer Mentor Review (Collaborative Critique) ➔ Week 4: Honors Challenge (Capstone Project)
 
 Cluster 1 (Steady Learners):
-Week 1: Concept Diagnostic (5 hrs/wk | Self-Check Quiz) ➔ Week 2: Guided Deep-Dive (6 hrs/wk | Interactive Micro-Labs) ➔ Week 3: Timed Practice Test (6 hrs/wk | Exam Simulation) ➔ Week 4: Distinction Bridge (5 hrs/wk | Optional Stretch Topic)
+Week 1: Concept Diagnostic (Micro-Gaps) ➔ Week 2: Interactive Micro-Labs (Applied Practice) ➔ Week 3: Timed Exam Simulation (Performance Drill) ➔ Week 4: Distinction Bridge (Mastery Leap)
 
 Cluster 2 (Deadline Crammers):
-Week 1: Micro-Milestone Setup (4 hrs/wk | 15-Min Daily Modules) ➔ Week 2: Streak Checkpoints (5 hrs/wk | Mid-Week Mini-Quiz) ➔ Week 3: Early Draft Gate (5 hrs/wk | 48h Pre-Deadline Lock) ➔ Week 4: Paced Exam Prep (6 hrs/wk | Spaced Flashcards)
+Week 1: Micro-Milestone Setup (20 min/day Pacing) ➔ Week 2: Mid-Week Checkpoints (Early Review Lock) ➔ Week 3: 48-Hour Draft Lock (Prevent Panic) ➔ Week 4: Paced Exam Prep (Structured Review)
 
 Cluster 3 (At-Risk Learners):
-Week 1: 1-on-1 Advisor Triage (3 hrs/wk | Faculty Check-In) ➔ Week 2: Foundational Recap (4 hrs/wk | Video Walkthroughs) ➔ Week 3: Scaffolded Practice (5 hrs/wk | Guided Step-by-Step Lab) ➔ Week 4: Recovery Checkpoint (5 hrs/wk | Low-Stakes Mastery Quiz)
+Week 1: Advisor Triage (Urgent 1-on-1 Call) ➔ Week 2: Bite-Sized Recaps (Scaffolded Core) ➔ Week 3: Scaffolded Tutorials (Guided Practice) ➔ Week 4: Mastery Recovery (Targeted Retrieval)
 ```
 
 ---
@@ -73,57 +89,87 @@ Week 1: 1-on-1 Advisor Triage (3 hrs/wk | Faculty Check-In) ➔ Week 2: Foundati
 ## 📁 Repository Structure
 
 ```
-educluster-ml/
+student-engagement-performance-clustering/
+├── .streamlit/
+│   └── config.toml               # Streamlit dark theme configuration (#0B0F19 canvas)
 ├── data/
-│   └── raw/                      # OULAD raw CSVs + deterministic 14,003-row OULAD benchmark dataset
+│   └── processed/                # Preprocessed OULAD feature matrices and audit jsons
+├── models/
+│   ├── kmeans_model.joblib       # Trained scikit-learn K-Means model (k = 4)
+│   ├── scaler.joblib             # Standard scaler instance
+│   └── cluster_metadata.json     # Centroid profiles & evaluation metrics
+├── reports/                      # High-DPI figures (fig1-fig7) & dashboard screenshots
 ├── src/
 │   ├── __init__.py
-│   ├── preprocess.py             # Objective 1: 16-feature compilation, log1p transforms & StandardScaler
-│   ├── clustering.py             # Objective 2: K-Means (k=4), k=2..8 sweeps & 2D PCA (82.0% variance)
-│   ├── validation.py             # Objective 3: Extrinsic validation (NMI, ARI, Chi2, Cramer's V)
-│   └── recommender.py            # Visual 4-Week Personalized Learning Path engine
-├── app.py                        # Product-grade dark-mode Streamlit dashboard (zero white tables)
-├── generate_deliverables.py      # Automated generator for IEEE .docx paper and 10-slide .pptx deck
-├── IEEE_Final_Project_Report.docx# Two-column IEEE research manuscript
-├── EduCluster_ML_Presentation.pptx# 10-slide 16:9 widescreen dark executive deck with speaker notes
-├── requirements.txt
+│   ├── preprocess.py             # Feature engineering across 3 domains (16 dimensions)
+│   ├── clustering.py             # K-Means++ clustering & 2D PCA projection
+│   ├── validation.py             # Extrinsic validation (Chi2, Cramer's V, NMI, ARI)
+│   ├── recommender.py            # Prescriptive 4-week roadmap synthesis engine
+│   └── visualization.py          # Dark-mode Plotly figures generator
+├── templates/
+│   └── presentation_template.pptx# Native master presentation template with university branding
+├── tests/
+│   ├── test_educluster.py        # Automated test suite
+│   └── test_edupulse.py
+├── app.py                        # Streamlit dark-mode analytics telemetry dashboard
+├── Dockerfile                    # Container definition for Docker & Cloud Run
+├── Procfile                      # Process file for Heroku / Render deployment
+├── render.yaml                   # Render Cloud deployment blueprint
+├── requirements.txt              # Production dependency specifications
+├── generate_deliverables.py      # Automated generator for IEEE paper & presentation deck
+├── EduCluster_ML_Presentation.pptx# 12-slide executive presentation deck
+├── IEEE_Conference_Template__2_.docx # IEEE two-column research manuscript
 └── README.md
 ```
 
 ---
 
-## 🚀 Quick Start & Installation
+## 🚀 Quick Start & Deployment
 
-### 1. Environment Setup
+### 1. Run via Streamlit Community Cloud (Recommended)
+1. Fork or open **[https://github.com/parasabhavyaswi/student-engagement-performance-clustering](https://github.com/parasabhavyaswi/student-engagement-performance-clustering)**.
+2. Sign in to **[share.streamlit.io](https://share.streamlit.io)**.
+3. Click **New app**, select this repository, set `app.py` as the main file, and click **Deploy**.
+4. The application is instantly live at: **`https://student-engagement-performance-clustering.streamlit.app`**.
+
+### 2. Local Environment Setup
 ```powershell
-# Clone or navigate to the repository
-cd educluster-ml
+# Clone the repository
+git clone https://github.com/parasabhavyaswi/student-engagement-performance-clustering.git
+cd student-engagement-performance-clustering
 
 # Install dependencies
 pip install -r requirements.txt
-```
 
-### 2. Generate Submission Deliverables (IEEE Paper & PPTX Deck)
-```powershell
-python generate_deliverables.py
-```
-Outputs:
-- `IEEE_Final_Project_Report.docx` (Two-column IEEE conference paper with 4 embedded high-DPI charts and Tables I–V)
-- `EduCluster_ML_Presentation.pptx` (10-slide 16:9 widescreen dark presentation with speaker notes)
-
-### 3. Launch Dark-Mode Analytics Dashboard
-```powershell
+# Launch interactive dashboard
 streamlit run app.py
 ```
 Access the application locally at: **`http://localhost:8501`**
 
+### 3. Run with Docker
+```bash
+# Build the Docker container
+docker build -t educluster-ml .
+
+# Run the container
+docker run -p 8501:8501 educluster-ml
+```
+
+### 4. Regenerate Academic Deliverables
+```powershell
+python generate_deliverables.py
+```
+Regenerates:
+- `EduCluster_ML_Presentation.pptx` (12-slide 16:9 widescreen presentation deck preserving template backgrounds)
+- `IEEE_Conference_Template__2_.docx` (Full two-column IEEE formatted research manuscript)
+
 ---
 
-## 🖥️ Dashboard Overview (`app.py`)
+## 🖥️ Dashboard Architecture (`app.py`)
 
-- **Design System**: High-contrast dark navy theme (`#0B0F19` canvas, `#111827` cards, `#1E293B` borders).
+- **Design System**: High-contrast dark navy palette (`#0B0F19` canvas, `#111827` cards, `#1E293B` borders).
 - **Zero White Tables**: Every data table is rendered via dark HTML styling or Plotly `go.Table`.
-- **Student Persona Simulator**: 4 sliders (Clicks, Active Days, Score, Submission Delay) + 4 preset profile buttons.
+- **Student Persona Simulator**: 4 interactive sliders (Clicks, Active Days, Score, Submission Delay) + 4 preset profile buttons with real-time Voronoi boundary prediction.
 - **Top KPI Row**: Total Cohort ($14,003$), Clusters ($k = 4$), Silhouette Score ($0.421$), NMI ($0.310$), Cramér's V ($0.537$).
 - **Tab 1 — Segmentation & PCA**: 2D PCA scatter plot with dynamic golden star marker ($\bigstar$) for the simulated student, 6-axis centroid radar polygon, and dark centroid table.
 - **Tab 2 — Validation Analysis**: Dual-axis elbow & silhouette curve ($k = 2..8$), $4 \times 4$ contingency matrix heatmap, and statistical summary.
@@ -133,7 +179,6 @@ Access the application locally at: **`http://localhost:8501`**
 
 ## 🧪 Automated Testing
 
-Run the test suite to verify data preprocessing, K-Means clustering, PCA variance, and validation calculations:
 ```powershell
 pytest -v
 ```

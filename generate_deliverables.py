@@ -575,9 +575,10 @@ def generate_deck():
     add_light_card(s11, 0.92, 4.38, 5.60, 1.15, "Future Work",
                    "• Implement cumulative weekly in-semester snapshots with temporal Transformer models to track real-time transitions and evaluate retention gains via live university RCTs.")
 
-    add_light_card(s11, 0.92, 5.65, 5.60, 1.25, "Deployment & Repository Links",
-                   "• Interactive Dashboard: Streamlit local deployment on http://localhost:8501\n"
-                   "• GitHub Repository: https://github.com/Bhavyaswiparasa/Educluster-ml",
+    add_light_card(s11, 0.92, 5.55, 5.60, 1.35, "Deployment & Repository Links",
+                   "• Cloud Deployment: https://student-engagement-performance-clustering.streamlit.app\n"
+                   "• Local Web Dashboard: http://localhost:8501\n"
+                   "• GitHub Repository: https://github.com/parasabhavyaswi/student-engagement-performance-clustering",
                    border_col=COLOR_ORANGE)
 
     img_dash = REPORTS_DIR / "dashboard_ui_overview.png"
