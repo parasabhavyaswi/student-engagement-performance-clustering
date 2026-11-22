@@ -387,8 +387,6 @@ def generate_deck():
                    border_col=COLOR_ORANGE)
 
     img_ksweep = REPORTS_DIR / "fig4_k_sweep.png"
-    if not img_ksweep.exists():
-        img_ksweep = REPORTS_DIR / "fig1_k_sweep.png"
     if img_ksweep.exists():
         # Native aspect ratio: 1.7105 -> width 5.05 in, height 2.95 in.
         s6.shapes.add_picture(str(img_ksweep), Inches(7.40), Inches(1.82), Inches(5.05), Inches(2.95))
@@ -426,15 +424,11 @@ def generate_deck():
     # Height = 2.70 in for all 3 bottom items.
     # PCA: aspect 1.5476 -> width 4.18 in
     img_pca = REPORTS_DIR / "fig5_pca.png"
-    if not img_pca.exists():
-        img_pca = REPORTS_DIR / "fig2_pca.png"
     if img_pca.exists():
         s7.shapes.add_picture(str(img_pca), Inches(0.92), Inches(4.18), Inches(4.18), Inches(2.70))
 
     # Radar: aspect 1.2000 -> width 3.24 in
     img_radar = REPORTS_DIR / "fig6_radar.png"
-    if not img_radar.exists():
-        img_radar = REPORTS_DIR / "fig3_radar.png"
     if img_radar.exists():
         s7.shapes.add_picture(str(img_radar), Inches(5.22), Inches(4.18), Inches(3.24), Inches(2.70))
 
@@ -477,8 +471,6 @@ def generate_deck():
                    border_col=COLOR_ORANGE)
 
     img_ct = REPORTS_DIR / "fig7_contingency.png"
-    if not img_ct.exists():
-        img_ct = REPORTS_DIR / "fig4_contingency.png"
     if img_ct.exists():
         # Native aspect ratio: 1.6316 -> width 5.05 in, height 3.10 in.
         s8.shapes.add_picture(str(img_ct), Inches(7.40), Inches(1.82), Inches(5.05), Inches(3.10))
@@ -602,6 +594,9 @@ def generate_deck():
     prs.save(OUTPUT_PATH)
     print(f"Presentation saved successfully to: {OUTPUT_PATH}")
     return OUTPUT_PATH
+
+
+main = generate_deck
 
 
 if __name__ == "__main__":

@@ -190,15 +190,19 @@ def test_recommender_prediction_and_roadmaps(pipeline_data):
 
 def test_deliverables_files_exist():
     """Verifies that IEEE report and executive presentation exist on disk and are non-empty."""
-    docx_file = PROJECT_ROOT / "IEEE_Final_Project_Report.docx"
+    docx_file = (
+        PROJECT_ROOT / "IEEE_Conference_Template__2_.docx"
+        if (PROJECT_ROOT / "IEEE_Conference_Template__2_.docx").exists()
+        else (PROJECT_ROOT / "IEEE_Final_Project_Report.docx")
+    )
     pptx_file = PROJECT_ROOT / "EduCluster_ML_Presentation.pptx"
 
     if not docx_file.exists() or not pptx_file.exists():
         from generate_deliverables import main as gen_main
         gen_main()
 
-    assert docx_file.exists(), "IEEE_Final_Project_Report.docx does not exist!"
-    assert docx_file.stat().st_size > 500000, "IEEE_Final_Project_Report.docx is smaller than expected!"
+    assert docx_file.exists(), "IEEE Research manuscript does not exist!"
+    assert docx_file.stat().st_size > 500000, "IEEE Research manuscript is smaller than expected!"
 
     assert pptx_file.exists(), "EduCluster_ML_Presentation.pptx does not exist!"
     assert pptx_file.stat().st_size > 40000, "EduCluster_ML_Presentation.pptx is smaller than expected!"

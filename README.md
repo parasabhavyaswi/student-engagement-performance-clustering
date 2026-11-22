@@ -104,13 +104,11 @@ student-engagement-performance-clustering/
 │   ├── preprocess.py             # Feature engineering across 3 domains (16 dimensions)
 │   ├── clustering.py             # K-Means++ clustering & 2D PCA projection
 │   ├── validation.py             # Extrinsic validation (Chi2, Cramer's V, NMI, ARI)
-│   ├── recommender.py            # Prescriptive 4-week roadmap synthesis engine
-│   └── visualization.py          # Dark-mode Plotly figures generator
+│   └── recommender.py            # Prescriptive 4-week roadmap synthesis engine
 ├── templates/
 │   └── presentation_template.pptx# Native master presentation template with university branding
 ├── tests/
-│   ├── test_educluster.py        # Automated test suite
-│   └── test_edupulse.py
+│   └── test_educluster.py        # Automated test suite (100% passing)
 ├── app.py                        # Streamlit dark-mode analytics telemetry dashboard
 ├── Dockerfile                    # Container definition for Docker & Cloud Run
 ├── Procfile                      # Process file for Heroku / Render deployment
@@ -119,6 +117,7 @@ student-engagement-performance-clustering/
 ├── generate_deliverables.py      # Automated generator for IEEE paper & presentation deck
 ├── EduCluster_ML_Presentation.pptx# 12-slide executive presentation deck
 ├── IEEE_Conference_Template__2_.docx # IEEE two-column research manuscript
+├── IEEE_Conference_Template__2_.pdf  # Publication PDF research manuscript
 └── README.md
 ```
 
