@@ -35,13 +35,19 @@ from ml_engine import (
 from recommender import (
     DEMO_PRESETS,
     DIMENSION_LABELS,
-    TIER_COLORS,
     diagnose_student_profile,
     create_readiness_gauge,
     create_comparison_chart,
     generate_dynamic_study_plan,
     generate_plan_markdown
 )
+try:
+    from recommender import TIER_COLORS
+except ImportError:
+    TIER_COLORS = {
+        0: "#059669", 1: "#2563EB", 2: "#D97706", 3: "#DC2626",
+        "thriving": "#059669", "steady": "#2563EB", "quiet": "#D97706", "support": "#DC2626"
+    }
 
 # -----------------------------------------------------------------------------
 # 1. Page Configuration & Executive Light SaaS Theme

@@ -69,7 +69,15 @@ TIER_COLORS = {
     0: "#059669",  # Emerald (Thriving Self-Starter)
     1: "#2563EB",  # Royal Blue (Steady Builder)
     2: "#D97706",  # Amber (Quiet Observer)
-    3: "#DC2626"   # Coral Red (Support-Priority Learner)
+    3: "#DC2626",  # Coral Red (Support-Priority Learner)
+    "thriving": "#059669",
+    "steady": "#2563EB",
+    "quiet": "#D97706",
+    "support": "#DC2626",
+    "Thriving Self-Starter": "#059669",
+    "Steady Builder": "#2563EB",
+    "Quiet Observer": "#D97706",
+    "Support-Priority Learner": "#DC2626"
 }
 
 STRENGTH_INSIGHTS = {
