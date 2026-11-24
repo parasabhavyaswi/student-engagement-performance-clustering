@@ -206,3 +206,97 @@ def test_deliverables_files_exist():
 
     assert pptx_file.exists(), "EduCluster_ML_Presentation.pptx does not exist!"
     assert pptx_file.stat().st_size > 40000, "EduCluster_ML_Presentation.pptx is smaller than expected!"
+
+
+def test_ml_engine_pipeline_and_personas():
+    """Verifies that ml_engine compiles 16 features, clusters into 4 personas, and computes valid metrics."""
+    from ml_engine import get_ml_pipeline, PERSONA_DEFINITIONS, ALL_16_FEATURES
+
+    pipe = get_ml_pipeline()
+    assert pipe.is_fitted
+    assert len(pipe.df) == 14003 or len(pipe.df) >= 10000
+    assert len(ALL_16_FEATURES) == 16
+
+    # Verify 4 personas exist
+    assert len(PERSONA_DEFINITIONS) == 4
+    assert PERSONA_DEFINITIONS[0]["name"] == "Thriving Self-Starter"
+    assert PERSONA_DEFINITIONS[1]["name"] == "Steady Builder"
+    assert PERSONA_DEFINITIONS[2]["name"] == "Quiet Observer"
+    assert PERSONA_DEFINITIONS[3]["name"] == "Support-Priority Learner"
+
+    # Verify metrics
+    metrics = pipe.metrics
+    assert 0.35 <= metrics["silhouette"] <= 0.55
+    assert 0.25 <= metrics["cramers_v"] <= 0.65
+    assert 0.20 <= metrics["nmi"] <= 0.45
+    assert metrics["p_value"] < 0.001
+
+    # Verify student prediction
+    pred = pipe.predict_student_profile(
+        weekly_study_activity=70,
+        ontime_assignment_rate=90,
+        quiz_test_average=80,
+        forum_participation=60,
+        attendance_consistency=85
+    )
+    assert pred["persona_id"] in [0, 1]
+    assert 0 <= pred["readiness_score"] <= 100
+    assert "student_radar" in pred
+    assert len(pred["student_radar"]) == 5
+
+    # Verify what-if simulation
+    whatif = pipe.simulate_what_if_improvement(
+        base_inputs={
+            "weekly_study_activity": 30,
+            "ontime_assignment_rate": 40,
+            "quiz_test_average": 50,
+            "forum_participation": 20,
+            "attendance_consistency": 40
+        },
+        boost_dimension="ontime_assignment_rate",
+        boost_percent=20
+    )
+    assert whatif["delta_readiness"] >= 0
+
+
+def test_recommender_and_export():
+    """Verifies student feedback, radar chart, roadmaps, and download generators."""
+    from recommender import (
+        STUDENT_PRESETS,
+        PERSONA_ROADMAPS,
+        generate_student_feedback,
+        create_habit_radar_chart,
+        generate_roadmap_markdown,
+        generate_roadmap_csv
+    )
+
+    assert len(STUDENT_PRESETS) == 4
+    assert len(PERSONA_ROADMAPS) == 4
+
+    # Feedback generation
+    fb = generate_student_feedback(
+        persona_id=1,
+        student_radar={"Study Activity": 70, "On-Time Rate": 90, "Quiz & Test Score": 80, "Class Participation": 40, "Attendance Regularity": 85},
+        readiness_score=78
+    )
+    assert fb["best_dimension"] in ["On-Time Rate", "Attendance Regularity", "Quiz & Test Score"]
+    assert "strength_title" in fb
+    assert "growth_title" in fb
+
+    # Habit Radar Chart
+    fig = create_habit_radar_chart(
+        student_radar={"Study Activity": 70, "On-Time Rate": 90, "Quiz & Test Score": 80, "Class Participation": 40, "Attendance Regularity": 85},
+        peer_radar={"Study Activity": 65, "On-Time Rate": 88, "Quiz & Test Score": 71, "Class Participation": 52, "Attendance Regularity": 76},
+        target_radar={"Study Activity": 90, "On-Time Rate": 96, "Quiz & Test Score": 92, "Class Participation": 85, "Attendance Regularity": 94}
+    )
+    assert fig is not None
+
+    # Exports
+    md = generate_roadmap_markdown("Student", "Steady Builder", 78, PERSONA_ROADMAPS[1]["weeks"], {"c1_w1_1": True})
+    assert "EduCluster" in md
+    assert "[x]" in md
+
+    csv_data = generate_roadmap_csv("Steady Builder", PERSONA_ROADMAPS[1]["weeks"], {"c1_w1_1": True})
+    assert "Week" in csv_data
+    assert "Task_Description" in csv_data
+

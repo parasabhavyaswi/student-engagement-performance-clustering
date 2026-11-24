@@ -59,31 +59,31 @@ flowchart TD
 
 ---
 
-## 📊 The Four Discovered Learner Personas
+## 📊 The Four Human-Centered Learner Personas
 
-| Cluster ID | Persona Name | Cohort Share | Median Score | Median Clicks | Median Active Days | Submission Delay | Completion Rate | Pedagogical Risk |
+| Cluster ID | Persona Name | Cohort Share | Median Score | Median Clicks | Active Days | Submission Pacing | Course Completion | Pedagogical Action & Support |
 | :---: | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **C0** | **High-Achieving Self-Directed** | 22.4% ($n = 3,141$) | **88.3%** | 2,811 | 87.6 d | -4.5 d (Early) | 97.8% | Low Risk |
-| **C1** | **Steady & Consistent Learners** | 37.4% ($n = 5,240$) | **71.0%** | 1,088 | 58.0 d | -1.5 d (Early) | 91.9% | Low/Moderate |
-| **C2** | **Crammers / Selective Engagers** | 22.7% ($n = 3,185$) | **52.4%** | 543 | 27.0 d | +2.2 d (Late) | 75.1% | Moderate Risk |
-| **C3** | **Disengaged / At-Risk** | 17.4% ($n = 2,437$) | **23.6%** | 111 | 11.0 d | +9.3 d (Overdue) | 31.9% | Critical Risk |
+| **C0** | **🌟 Thriving Self-Starter** | 22.4% ($n = 3,141$) | **88.3%** | 2,811 | 87.6 d | -4.5 d (Early) | 97.8% | Honors inquiry, advanced case labs, peer mentorship leadership |
+| **C1** | **🚀 Steady Builder** | 37.4% ($n = 5,240$) | **71.0%** | 1,088 | 58.0 d | -1.5 d (Early) | 91.9% | Intermediate stretch exercises, timed practice, group projects |
+| **C2** | **🔍 Quiet Observer** | 22.7% ($n = 3,185$) | **52.4%** | 543 | 27.0 d | +2.2 d (Late) | 75.1% | Automated deadline nudges, 15-min micro-quizzes, interactive prompts |
+| **C3** | **🛡️ Support-Priority Learner** | 17.4% ($n = 2,437$) | **23.6%** | 111 | 11.0 d | +9.3 d (Overdue) | 31.9% | Empathetic 1-on-1 counseling, diagnostic scaffolding, simplified checklists |
 
 ---
 
 ## 🗺️ 4-Week Personalized Learning Path Framework
 
 ```
-Cluster 0 (High-Achievers):
+🌟 Thriving Self-Starter:
 Week 1: Core Fast-Track (Accelerated Pace) ➔ Week 2: Advanced Case Lab (Deep Inquiry) ➔ Week 3: Peer Mentor Review (Collaborative Critique) ➔ Week 4: Honors Challenge (Capstone Project)
 
-Cluster 1 (Steady Learners):
+🚀 Steady Builder:
 Week 1: Concept Diagnostic (Micro-Gaps) ➔ Week 2: Interactive Micro-Labs (Applied Practice) ➔ Week 3: Timed Exam Simulation (Performance Drill) ➔ Week 4: Distinction Bridge (Mastery Leap)
 
-Cluster 2 (Deadline Crammers):
+🔍 Quiet Observer:
 Week 1: Micro-Milestone Setup (20 min/day Pacing) ➔ Week 2: Mid-Week Checkpoints (Early Review Lock) ➔ Week 3: 48-Hour Draft Lock (Prevent Panic) ➔ Week 4: Paced Exam Prep (Structured Review)
 
-Cluster 3 (At-Risk Learners):
-Week 1: Advisor Triage (Urgent 1-on-1 Call) ➔ Week 2: Bite-Sized Recaps (Scaffolded Core) ➔ Week 3: Scaffolded Tutorials (Guided Practice) ➔ Week 4: Mastery Recovery (Targeted Retrieval)
+🛡️ Support-Priority Learner:
+Week 1: Diagnostic Reset (1-on-1 Outreach) ➔ Week 2: Guided Prerequisite Re-enforcement ➔ Week 3: Confidence-Building Problem Sets ➔ Week 4: Essential Milestone Completion & Safety Net
 ```
 
 ---
@@ -95,7 +95,9 @@ student-engagement-performance-clustering/
 ├── .streamlit/
 │   └── config.toml               # Streamlit dark theme configuration (#0B0F19 canvas)
 ├── data/
-│   └── processed/                # Preprocessed OULAD feature matrices and audit jsons
+│   ├── processed/                # Preprocessed OULAD feature matrices and audit jsons
+│   └── raw/
+│       └── oulad_features_14003.csv # Compiled 16-feature benchmark dataset (14,003 students)
 ├── models/
 │   ├── kmeans_model.joblib       # Trained scikit-learn K-Means model (k = 4)
 │   ├── scaler.joblib             # Standard scaler instance
@@ -110,8 +112,10 @@ student-engagement-performance-clustering/
 ├── templates/
 │   └── presentation_template.pptx# Native master presentation template with university branding
 ├── tests/
-│   └── test_educluster.py        # Automated test suite (100% passing)
-├── app.py                        # Streamlit dark-mode analytics telemetry dashboard
+│   └── test_educluster.py        # Automated test suite (12/12 passing)
+├── app.py                        # Target-user-first Streamlit web application (Student & Faculty views)
+├── ml_engine.py                  # Core ML pipeline (16 features, 14,003 records, k=4, 2D PCA, validation)
+├── recommender.py                # Student-first recommender, habit radar, what-if simulator, & roadmaps
 ├── Dockerfile                    # Container definition for Docker & Cloud Run
 ├── Procfile                      # Process file for Heroku / Render deployment
 ├── render.yaml                   # Render Cloud deployment blueprint
