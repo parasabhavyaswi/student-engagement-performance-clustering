@@ -1,11 +1,14 @@
 """
-app.py - EduCluster: Personalized Learning Companion (SIH26036)
-K-Means Clustering of Student Engagement & Performance Data for Personalized Learning Path Design
+app.py - EduCluster: Personalized Learning Path Engine
+Client-Ready EdTech SaaS Product Architecture (Executive Light Theme)
 
-Principal EdTech Product Designer & Applied Machine Learning Engineer Architecture:
-- Target-User-First Philosophy: Supportive, encouraging interface for Students & Faculty.
-- Role Switcher: Student Workspace (Default) | Faculty Mentor & SIH26036 Validation Hub.
-- Modular Backend: Powered by ml_engine.py and recommender.py.
+Strict Design Philosophy:
+1. Executive Light-Mode Theme: Soft slate canvas (#F8FAFC), pure white cards (#FFFFFF), dark charcoal typography (#0F172A).
+2. Guided 3-Step Top Navigation:
+   - Tab 1: 1. Student Self-Check (Default Landing Screen)
+   - Tab 2: 2. My 4-Week Study Plan (Actionable Roadmap)
+   - Tab 3: 3. Cohort & Model Validation (Faculty & Evaluator Proof)
+3. Zero clutter, max 2-column layouts, and high-contrast readable charts.
 """
 
 import os
@@ -31,65 +34,91 @@ from ml_engine import (
     ALL_16_FEATURES
 )
 from recommender import (
-    STUDENT_PRESETS,
-    PERSONA_ROADMAPS,
-    generate_student_feedback,
-    create_habit_radar_chart,
-    generate_roadmap_markdown,
-    generate_roadmap_csv
+    DEMO_PRESETS,
+    DIMENSION_LABELS,
+    diagnose_student_profile,
+    create_comparison_chart,
+    get_tailored_study_plan,
+    generate_plan_markdown
 )
 
 # -----------------------------------------------------------------------------
-# 1. Page Configuration & Custom CSS
+# 1. Page Configuration & Executive Light SaaS Theme
 # -----------------------------------------------------------------------------
 st.set_page_config(
-    page_title="EduCluster — Your Personalized Learning Companion",
+    page_title="EduCluster — Personalized Learning Path Engine",
     page_icon="🎓",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
-# High-contrast, clean dark theme CSS with cards, badges, and responsive spacing
+# High-contrast, clean executive light theme CSS
 st.markdown("""
 <style>
-    /* Global Base */
+    /* Executive Canvas */
     .stApp {
-        background-color: #0B0F19;
-        color: #F8FAFC;
+        background-color: #F8FAFC !important;
+        color: #0F172A !important;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
     
-    /* Headers & Text */
-    h1, h2, h3, h4, h5 {
-        color: #F8FAFC !important;
+    /* Hide Streamlit Clutter */
+    #MainMenu {visibility: hidden !important;}
+    footer {visibility: hidden !important;}
+    header {visibility: hidden !important;}
+    div[data-testid="stDeployButton"] {visibility: hidden !important;}
+    
+    /* Typography */
+    h1, h2, h3, h4, h5, h6 {
+        color: #0F172A !important;
         font-weight: 700 !important;
         letter-spacing: -0.02em;
     }
-    
     p, li, span, label {
-        color: #CBD5E1;
+        color: #334155;
     }
     
-    /* Custom Surface Cards */
-    .edu-card {
-        background: #111827;
-        border: 1px solid #1E293B;
-        border-radius: 12px;
-        padding: 20px 24px;
-        margin-bottom: 18px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+    /* Top Guided Navigation Tabs - High Contrast Light Mode */
+    div[data-testid="stTabs"] button {
+        font-size: 1.05rem !important;
+        font-weight: 600 !important;
+        color: #475569 !important;
+        padding: 12px 24px !important;
+        border-radius: 8px 8px 0 0 !important;
+        background: transparent !important;
+        border: none !important;
+    }
+    div[data-testid="stTabs"] button:hover {
+        color: #2563EB !important;
+        background: #F1F5F9 !important;
+    }
+    div[data-testid="stTabs"] button[aria-selected="true"] {
+        color: #2563EB !important;
+        font-weight: 700 !important;
+        border-bottom: 3px solid #2563EB !important;
+        background: #FFFFFF !important;
     }
     
-    .edu-card-highlight {
-        background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%);
-        border: 1px solid #334155;
+    /* Clean SaaS Surface Cards */
+    .saas-card {
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
         border-radius: 12px;
-        padding: 20px 24px;
-        margin-bottom: 18px;
+        padding: 24px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+    }
+    
+    .saas-kpi-card {
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        border-radius: 10px;
+        padding: 18px 20px;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
     }
 
-    /* Badges */
-    .persona-badge {
+    /* Persona Badges */
+    .badge-persona {
         display: inline-flex;
         align-items: center;
         gap: 8px;
@@ -97,713 +126,656 @@ st.markdown("""
         border-radius: 9999px;
         font-weight: 700;
         font-size: 0.95rem;
-        letter-spacing: 0.02em;
-        margin-bottom: 10px;
-    }
-    
-    .metric-pill {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        background: #1E293B;
-        color: #94A3B8;
-        border: 1px solid #334155;
+        letter-spacing: 0.01em;
     }
 
-    /* Preset Buttons */
+    /* Buttons */
     div[data-testid="stButton"] > button {
-        border-radius: 8px;
-        font-weight: 600;
-        border: 1px solid #334155;
-        background: #1E293B;
-        color: #F8FAFC;
-        transition: all 0.2s ease-in-out;
+        background: #FFFFFF !important;
+        color: #0F172A !important;
+        border: 1px solid #CBD5E1 !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        padding: 8px 16px !important;
+        transition: all 0.15s ease-in-out !important;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
     }
     div[data-testid="stButton"] > button:hover {
-        border-color: #38BDF8;
-        background: #0F172A;
-        color: #38BDF8;
-        transform: translateY(-1px);
-    }
-
-    /* Checkbox & Progress Styling */
-    div[data-testid="stCheckbox"] {
-        padding: 6px 0;
-    }
-    div[data-testid="stCheckbox"] label span {
-        font-size: 0.95rem;
-        color: #E2E8F0;
+        border-color: #2563EB !important;
+        color: #2563EB !important;
+        background: #EFF6FF !important;
+        transform: translateY(-1px) !important;
     }
     
-    /* Streamlit Metric Overrides */
+    /* Sliders */
+    div[data-testid="stSlider"] label {
+        font-size: 0.92rem !important;
+        font-weight: 600 !important;
+        color: #1E293B !important;
+    }
+    
+    /* Metrics */
     div[data-testid="stMetricValue"] {
-        font-size: 1.8rem !important;
-        font-weight: 700 !important;
-        color: #38BDF8 !important;
+        font-size: 1.85rem !important;
+        font-weight: 800 !important;
+        color: #0F172A !important;
     }
     div[data-testid="stMetricLabel"] {
-        color: #94A3B8 !important;
+        color: #64748B !important;
         font-size: 0.85rem !important;
         font-weight: 600 !important;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    /* Checkbox list */
+    div[data-testid="stCheckbox"] label span {
+        font-size: 0.92rem !important;
+        color: #1E293B !important;
+        font-weight: 500 !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
-# 2. Session State Initialization
+# 2. Safe Session State Initialization
 # -----------------------------------------------------------------------------
 def init_session_state():
-    """Initializes safe session state defaults to prevent KeyError."""
+    """Initializes safe defaults for all inputs, presets, and checkboxes."""
     if "active_preset" not in st.session_state:
-        st.session_state.active_preset = "regular"
+        st.session_state.active_preset = "topper"
 
-    # Set default slider values from 'regular' preset if not yet initialized
-    preset_data = STUDENT_PRESETS["regular"]
+    preset_defaults = DEMO_PRESETS["topper"]
     for key in ["weekly_study_activity", "ontime_assignment_rate", "quiz_test_average", "forum_participation", "attendance_consistency"]:
         if key not in st.session_state:
-            st.session_state[key] = preset_data[key]
+            st.session_state[key] = preset_defaults[key]
 
-    if "roadmap_checkboxes" not in st.session_state:
-        st.session_state.roadmap_checkboxes = {}
-
-    if "whatif_boost" not in st.session_state:
-        st.session_state.whatif_boost = 15
-
-    if "role_view" not in st.session_state:
-        st.session_state.role_view = "🎒 Student View"
+    if "task_checks" not in st.session_state:
+        st.session_state.task_checks = {}
 
 init_session_state()
 
 # -----------------------------------------------------------------------------
-# 3. Load Machine Learning Engine
+# 3. Cached ML Engine Loader
 # -----------------------------------------------------------------------------
-@st.cache_resource(show_spinner="Initializing EduCluster ML Engine (14,003 records, k=4)...")
-def load_engine():
+@st.cache_resource(show_spinner="Loading EduCluster Engine (14,003 records, k=4)...")
+def load_ml_pipeline():
     pipeline = get_ml_pipeline()
     return pipeline
 
-ml_pipe = load_engine()
+pipeline = load_ml_pipeline()
 
 # -----------------------------------------------------------------------------
-# 4. Top Header & Target-User Role Switcher
+# 4. Top Executive Product Header
 # -----------------------------------------------------------------------------
-col_header, col_role = st.columns([2.8, 1.2])
+head_col1, head_col2 = st.columns([3.2, 0.8])
+with head_col1:
+    st.markdown("<div style='margin-top: 10px;'>", unsafe_allow_html=True)
+    st.markdown("<h2 style='margin: 0; color: #0F172A; display: inline-flex; align-items: center; gap: 10px;'>🎓 EduCluster <span style='font-size: 1.05rem; font-weight: 500; color: #2563EB; background: #EFF6FF; border: 1px solid #BFDBFE; padding: 2px 10px; border-radius: 6px;'>SaaS Edition</span></h2>", unsafe_allow_html=True)
+    st.markdown("<p style='margin: 4px 0 0 0; color: #64748B; font-size: 0.95rem;'>Personalized Learning Path Engine for Academic Success & Proactive Intervention (SIH26036)</p>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-with col_header:
-    st.markdown("### 🎓 EduCluster — Your Personalized Learning Companion")
-    st.caption("Empowering students and faculty with adaptive learning path design and actionable behavioral insights • SIH26036")
+with head_col2:
+    st.markdown("<div style='text-align: right; margin-top: 18px;'>", unsafe_allow_html=True)
+    st.markdown("<span style='display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; background: #F1F5F9; color: #0F172A; border: 1px solid #CBD5E1;'>Live Client Demo</span>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-with col_role:
-    selected_role = st.radio(
-        "Current Perspective:",
-        options=["🎒 Student View", "🎓 Faculty & Evaluator View"],
-        index=0 if st.session_state.role_view == "🎒 Student View" else 1,
-        horizontal=True,
-        label_visibility="collapsed"
-    )
-    st.session_state.role_view = selected_role
+st.markdown("<hr style='border: 0; border-top: 1px solid #E2E8F0; margin: 16px 0 20px 0;'>", unsafe_allow_html=True)
 
-st.markdown("<hr style='border: 0; border-top: 1px solid #1E293B; margin: 8px 0 24px 0;'>", unsafe_allow_html=True)
+# -----------------------------------------------------------------------------
+# 5. Guided 3-Step Top Navigation
+# -----------------------------------------------------------------------------
+tab1, tab2, tab3 = st.tabs([
+    "1. Student Self-Check",
+    "2. My 4-Week Study Plan",
+    "3. Cohort & Model Validation"
+])
 
 
 # =============================================================================
-# VIEW 1: STUDENT WORKSPACE (Default Landing Screen)
+# TAB 1: STUDENT SELF-CHECK (Default Landing Screen)
 # =============================================================================
-if st.session_state.role_view == "🎒 Student View":
+with tab1:
+    # Top Value Proposition Banner
+    st.markdown("""
+    <div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 8px; padding: 12px 18px; margin-bottom: 20px;">
+        <span style="font-size: 0.95rem; font-weight: 600; color: #1E40AF;">
+            💡 Discover your unique learning style in 30 seconds and receive an actionable, step-by-step 4-week study plan.
+        </span>
+    </div>
+    """, unsafe_allow_html=True)
 
-    st.markdown("#### 👋 Welcome to Your Learning Success Hub")
-    st.markdown("Discover your unique study style, see how your habits compare with peer benchmarks, and get an encouraging, step-by-step roadmap tailored specifically to your goals.")
+    # 2-Column Main Workspace
+    col_input, col_diag = st.columns([1.0, 1.25], gap="large")
 
     # -------------------------------------------------------------------------
-    # Section 1: Check My Learning Style (1-Click Presets & Dials)
+    # Left Column: Simple Habit Check-In Card
     # -------------------------------------------------------------------------
-    with st.expander("⚡ **Step 1: Check My Learning Style (Quick Check-In)**", expanded=True):
-        st.markdown("**Choose a quick preset or fine-tune your actual study habits below:**")
+    with col_input:
+        st.markdown("<div class='saas-card'>", unsafe_allow_html=True)
+        st.markdown("<h4 style='margin-top: 0; margin-bottom: 4px; font-size: 1.15rem;'>⚡ Quick Habit Check-In</h4>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size: 0.85rem; color: #64748B; margin-bottom: 14px;'>Pick a preset or slide to match your weekly study pattern:</p>", unsafe_allow_html=True)
 
-        col_p1, col_p2, col_p3, col_p4 = st.columns(4)
+        # 4 Clean Pill Presets
+        p_col1, p_col2 = st.columns(2)
+        p_col3, p_col4 = st.columns(2)
 
-        def apply_preset(preset_key: str):
-            p = STUDENT_PRESETS[preset_key]
+        def set_preset(name: str):
+            p = DEMO_PRESETS[name]
             st.session_state.weekly_study_activity = p["weekly_study_activity"]
             st.session_state.ontime_assignment_rate = p["ontime_assignment_rate"]
             st.session_state.quiz_test_average = p["quiz_test_average"]
             st.session_state.forum_participation = p["forum_participation"]
             st.session_state.attendance_consistency = p["attendance_consistency"]
-            st.session_state.active_preset = preset_key
+            st.session_state.active_preset = name
 
-        with col_p1:
-            if st.button("🌱 I study regularly", use_container_width=True, help="Steady weekly pace, consistent attendance"):
-                apply_preset("regular")
-        with col_p2:
-            if st.button("⚡ I cram before deadlines", use_container_width=True, help="Capable scores, concentrated bursts before due dates"):
-                apply_preset("crammer")
-        with col_p3:
-            if st.button("🎧 I rarely open the portal", use_container_width=True, help="Low digital clicks, passive attendance, needs interactive nudges"):
-                apply_preset("quiet")
-        with col_p4:
-            if st.button("🆘 I'm falling behind", use_container_width=True, help="Overdue work, missed sessions, needs supportive scaffolding"):
-                apply_preset("falling_behind")
+        with p_col1:
+            if st.button(DEMO_PRESETS["topper"]["label"], use_container_width=True):
+                set_preset("topper")
+        with p_col2:
+            if st.button(DEMO_PRESETS["crammer"]["label"], use_container_width=True):
+                set_preset("crammer")
+        with p_col3:
+            if st.button(DEMO_PRESETS["quiet"]["label"], use_container_width=True):
+                set_preset("quiet")
+        with p_col4:
+            if st.button(DEMO_PRESETS["behind"]["label"], use_container_width=True):
+                set_preset("behind")
 
-        st.caption(f"Active Profile Preset: **{STUDENT_PRESETS[st.session_state.active_preset]['label']}** — *{STUDENT_PRESETS[st.session_state.active_preset]['description']}*")
+        st.markdown("<hr style='border: 0; border-top: 1px solid #F1F5F9; margin: 16px 0 14px 0;'>", unsafe_allow_html=True)
 
-        st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("**Fine-Tune Your 5 Core Study Habits:**")
-
-        c_dial1, c_dial2, c_dial3, c_dial4, c_dial5 = st.columns(5)
-
-        with c_dial1:
-            val_study = st.slider(
-                "Weekly Study Activity",
-                min_value=0, max_value=100,
-                value=int(st.session_state.weekly_study_activity),
-                help="Time spent reviewing reading material, course assets, and practice exercises.",
-                key="weekly_study_activity"
-            )
-        with c_dial2:
-            val_ontime = st.slider(
-                "On-Time Assignment Rate",
-                min_value=0, max_value=100,
-                value=int(st.session_state.ontime_assignment_rate),
-                format="%d%%",
-                help="Percentage of coursework and quizzes submitted on or before the due date.",
-                key="ontime_assignment_rate"
-            )
-        with c_dial3:
-            val_quiz = st.slider(
-                "Quiz & Test Average",
-                min_value=0, max_value=100,
-                value=int(st.session_state.quiz_test_average),
-                format="%d%%",
-                help="Your current score average across self-check quizzes, midterms, and lab milestones.",
-                key="quiz_test_average"
-            )
-        with c_dial4:
-            val_forum = st.slider(
-                "Class Participation",
-                min_value=0, max_value=100,
-                value=int(st.session_state.forum_participation),
-                help="Active engagement in discussion boards, Q&A threads, and group study channels.",
-                key="forum_participation"
-            )
-        with c_dial5:
-            val_att = st.slider(
-                "Weekly Attendance Consistency",
-                min_value=0, max_value=100,
-                value=int(st.session_state.attendance_consistency),
-                format="%d%%",
-                help="Reliability of weekly platform logins and lecture presence across the term.",
-                key="attendance_consistency"
-            )
+        # 5 Plain-English Sliders
+        s_act = st.slider(
+            "1. Weekly Portal Study Activity",
+            min_value=0, max_value=100,
+            value=int(st.session_state.weekly_study_activity),
+            format="%d%%",
+            help="Weekly time and clicks dedicated to reading materials and modules.",
+            key="weekly_study_activity"
+        )
+        s_ontime = st.slider(
+            "2. On-Time Assignment Submissions",
+            min_value=0, max_value=100,
+            value=int(st.session_state.ontime_assignment_rate),
+            format="%d%%",
+            help="Percentage of assignments submitted before or on the deadline.",
+            key="ontime_assignment_rate"
+        )
+        s_quiz = st.slider(
+            "3. Average Quiz & Test Score",
+            min_value=0, max_value=100,
+            value=int(st.session_state.quiz_test_average),
+            format="%d%%",
+            help="Your average score across graded quizzes and problem sets.",
+            key="quiz_test_average"
+        )
+        s_forum = st.slider(
+            "4. Class & Forum Participation",
+            min_value=0, max_value=100,
+            value=int(st.session_state.forum_participation),
+            format="%d%%",
+            help="Active engagement on discussion boards, Q&A, and study groups.",
+            key="forum_participation"
+        )
+        s_att = st.slider(
+            "5. Weekly Attendance Consistency",
+            min_value=0, max_value=100,
+            value=int(st.session_state.attendance_consistency),
+            format="%d%%",
+            help="Regularity of lecture attendance and weekly portal check-ins.",
+            key="attendance_consistency"
+        )
+        st.markdown("</div>", unsafe_allow_html=True)
 
     # -------------------------------------------------------------------------
-    # Compute Student Prediction from ML Engine
+    # Real-Time Diagnosis Computation
     # -------------------------------------------------------------------------
-    current_inputs = {
+    active_inputs = {
+        "weekly_study_activity": float(s_act),
+        "ontime_assignment_rate": float(s_ontime),
+        "quiz_test_average": float(s_quiz),
+        "forum_participation": float(s_forum),
+        "attendance_consistency": float(s_att)
+    }
+
+    pred_result = pipeline.predict_student_profile(**active_inputs)
+    persona_id = pred_result["persona_id"]
+    persona_data = pred_result["persona"]
+    readiness_score = pred_result["readiness_score"]
+
+    diagnosis = diagnose_student_profile(
+        persona_id=persona_id,
+        inputs=active_inputs,
+        readiness_score=readiness_score
+    )
+
+    # Save to session state for Tab 2
+    st.session_state.current_persona_id = persona_id
+    st.session_state.current_readiness = readiness_score
+
+    # -------------------------------------------------------------------------
+    # Right Column: Clear Diagnosis Card
+    # -------------------------------------------------------------------------
+    with col_diag:
+        st.markdown("<div class='saas-card'>", unsafe_allow_html=True)
+
+        # Persona Header & Badge
+        p_color = persona_data["badge_color"]
+        st.markdown(f"""
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+            <div>
+                <span class="badge-persona" style="background: {p_color}18; color: {p_color}; border: 1px solid {p_color}44;">
+                    {persona_data['icon']} {persona_data['name']}
+                </span>
+                <h3 style="margin: 8px 0 4px 0; font-size: 1.35rem; color: #0F172A;">{persona_data['tagline']}</h3>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-size: 0.75rem; font-weight: 700; color: #64748B; text-transform: uppercase;">Readiness Score</div>
+                <div style="font-size: 1.8rem; font-weight: 800; color: {p_color};">{readiness_score}<span style="font-size: 1.0rem; color: #94A3B8;">/100</span></div>
+            </div>
+        </div>
+        <p style="font-size: 0.92rem; color: #475569; line-height: 1.5; margin-bottom: 16px;">
+            {persona_data['description']}
+        </p>
+        """, unsafe_allow_html=True)
+
+        # Callout Boxes: Top Strength & #1 Focus Area
+        col_c1, col_c2 = st.columns(2)
+        with col_c1:
+            st.markdown(f"""
+            <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 12px 14px; height: 100%;">
+                <div style="font-size: 0.78rem; font-weight: 700; color: #166534; text-transform: uppercase;">✨ Your Top Strength</div>
+                <div style="font-weight: 700; font-size: 0.95rem; color: #14532D; margin: 2px 0 4px 0;">{diagnosis['best_title']} ({diagnosis['best_val']}%)</div>
+                <div style="font-size: 0.82rem; color: #166534; line-height: 1.35;">{diagnosis['best_desc']}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with col_c2:
+            st.markdown(f"""
+            <div style="background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 12px 14px; height: 100%;">
+                <div style="font-size: 0.78rem; font-weight: 700; color: #92400E; text-transform: uppercase;">🎯 #1 Focus Area</div>
+                <div style="font-weight: 700; font-size: 0.95rem; color: #78350F; margin: 2px 0 4px 0;">{diagnosis['worst_title']} ({diagnosis['worst_val']}%)</div>
+                <div style="font-size: 0.82rem; color: #92400E; line-height: 1.35;">{diagnosis['worst_desc']}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        # Clean Comparison Chart
+        st.markdown("<hr style='border: 0; border-top: 1px solid #F1F5F9; margin: 18px 0 12px 0;'>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size: 0.9rem; font-weight: 700; color: #0F172A; margin-bottom: 2px;'>📊 Habit Benchmark Comparison</div>", unsafe_allow_html=True)
+        st.caption("How your habits compare against the top-performer benchmark across all 5 pillars:")
+
+        fig_comp = create_comparison_chart(active_inputs)
+        st.plotly_chart(fig_comp, use_container_width=True, config={"displayModeBar": False})
+
+        # Live "What-If" Insight Box
+        st.markdown(f"""
+        <div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 8px; padding: 12px 16px; margin-top: 6px;">
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 700; color: #1E40AF;">
+                <span>🔮 Actionable "What-If" Insight</span>
+            </div>
+            <div style="font-size: 0.88rem; color: #1E3A8A; margin-top: 4px; line-height: 1.45;">
+                {diagnosis['whatif_summary']}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+
+# =============================================================================
+# TAB 2: MY 4-WEEK STUDY PLAN (Actionable Roadmap)
+# =============================================================================
+with tab2:
+    current_pid = st.session_state.get("current_persona_id", 0)
+    current_rscore = st.session_state.get("current_readiness", 85)
+    p_info = PERSONA_DEFINITIONS[current_pid]
+
+    study_plan = get_tailored_study_plan(current_pid)
+
+    # Calculate completion percentage
+    total_tasks = sum(len(w["tasks"]) for w in study_plan["weeks"])
+    done_tasks = sum(
+        1 for w in study_plan["weeks"] for t in w["tasks"]
+        if st.session_state.task_checks.get(t["id"], False)
+    )
+    completion_pct = int(round((done_tasks / max(total_tasks, 1)) * 100))
+
+    # Header KPI Strip (3 cards)
+    k_col1, k_col2, k_col3 = st.columns(3)
+    with k_col1:
+        st.markdown(f"""
+        <div class='saas-kpi-card'>
+            <div style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase;">Assigned Persona</div>
+            <div style="font-size: 1.35rem; font-weight: 800; color: #0F172A; margin-top: 4px;">{p_info['icon']} {p_info['name']}</div>
+            <div style="font-size: 0.82rem; color: #64748B; margin-top: 2px;">{p_info['priority']} Tier</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with k_col2:
+        st.markdown(f"""
+        <div class='saas-kpi-card'>
+            <div style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase;">Current Academic Readiness</div>
+            <div style="font-size: 1.35rem; font-weight: 800; color: #2563EB; margin-top: 4px;">{current_rscore}/100</div>
+            <div style="font-size: 0.82rem; color: #64748B; margin-top: 2px;">Weighted Habit Score</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with k_col3:
+        st.markdown(f"""
+        <div class='saas-kpi-card'>
+            <div style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase;">Roadmap Progress</div>
+            <div style="font-size: 1.35rem; font-weight: 800; color: #0D9488; margin-top: 4px;">{completion_pct}% Finished</div>
+            <div style="font-size: 0.82rem; color: #64748B; margin-top: 2px;">{done_tasks} of {total_tasks} Actionable Tasks</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # 4 Clean Weekly Cards (2x2 Grid)
+    grid_row1_col1, grid_row1_col2 = st.columns(2, gap="medium")
+    grid_row2_col1, grid_row2_col2 = st.columns(2, gap="medium")
+
+    grid_slots = [grid_row1_col1, grid_row1_col2, grid_row2_col1, grid_row2_col2]
+
+    for idx, week in enumerate(study_plan["weeks"]):
+        with grid_slots[idx]:
+            st.markdown(f"""
+            <div class='saas-card' style="height: 100%;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #2563EB; text-transform: uppercase;">Week {week['week_num']} Milestone</span>
+                    <span style="font-size: 0.75rem; font-weight: 600; background: #F1F5F9; color: #475569; padding: 2px 8px; border-radius: 4px;">3 Action Tasks</span>
+                </div>
+                <h4 style="margin: 4px 0 2px 0; font-size: 1.1rem; color: #0F172A;">{week['title']}</h4>
+                <p style="font-size: 0.82rem; color: #64748B; margin-bottom: 14px;">{week['tagline']}</p>
+            """, unsafe_allow_html=True)
+
+            for task in week["tasks"]:
+                t_id = task["id"]
+                val = st.checkbox(
+                    f"{task['task']} ({task['time']})",
+                    value=st.session_state.task_checks.get(t_id, False),
+                    key=f"plan_check_{t_id}"
+                )
+                st.session_state.task_checks[t_id] = val
+
+            st.markdown("</div>", unsafe_allow_html=True)
+
+    # Actionable Bottom Section: Download Personal Study Plan
+    st.markdown("<br>", unsafe_allow_html=True)
+    down_col1, down_col2 = st.columns([1.5, 3.5])
+
+    markdown_doc = generate_plan_markdown(
+        student_name="Student Learner",
+        persona_name=p_info["name"],
+        readiness_score=current_rscore,
+        study_plan=study_plan,
+        checkbox_states=st.session_state.task_checks
+    )
+
+    with down_col1:
+        st.download_button(
+            label="📥 Download Personal Study Plan (.md)",
+            data=markdown_doc,
+            file_name=f"EduCluster_Study_Plan_{p_info['name'].replace(' ', '_')}.md",
+            mime="text/markdown",
+            use_container_width=True
+        )
+
+    with down_col2:
+        st.caption("Tip: Download your personalized markdown study plan to import into Notion, Obsidian, or Google Docs for offline tracking.")
+
+
+# =============================================================================
+# TAB 3: COHORT & MODEL VALIDATION (Executive Proof for Clients & Evaluators)
+# =============================================================================
+with tab3:
+    st.markdown("""
+    <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px 18px; margin-bottom: 22px;">
+        <span style="font-weight: 700; color: #0F172A; font-size: 1.0rem;">🔬 Executive Proof & Empirical Validation Hub</span>
+        <p style="font-size: 0.88rem; color: #475569; margin: 4px 0 0 0; line-height: 1.5;">
+            EduCluster evaluates 14,003 student enrolments using 16 non-leaking engagement, attendance, and assessment features. 
+            Clusters are validated strictly against unobserved end-of-course teacher grades (Distinction, Pass, Fail, Withdrawn).
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # -------------------------------------------------------------------------
+    # Section A — Cohort Overview (3 KPI Cards + 1 Clean Chart)
+    # -------------------------------------------------------------------------
+    st.markdown("<h4 style='font-size: 1.15rem; color: #0F172A; margin-bottom: 12px;'>A. Cohort Overview & Strategic Faculty Actions</h4>", unsafe_allow_html=True)
+
+    df_c = pipeline.df
+    tot_students = len(df_c)
+    n_features = len(ALL_16_FEATURES)
+    k_clusters = pipeline.n_clusters
+
+    c_kpi1, c_kpi2, c_kpi3 = st.columns(3)
+    with c_kpi1:
+        st.markdown(f"""
+        <div class='saas-kpi-card'>
+            <div style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase;">Total Students Analyzed</div>
+            <div style="font-size: 1.85rem; font-weight: 800; color: #0F172A; margin-top: 4px;">{tot_students:,}</div>
+            <div style="font-size: 0.82rem; color: #64748B;">OULAD Course Enrolments</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with c_kpi2:
+        st.markdown(f"""
+        <div class='saas-kpi-card'>
+            <div style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase;">Engineered Behavioral Features</div>
+            <div style="font-size: 1.85rem; font-weight: 800; color: #2563EB; margin-top: 4px;">{n_features} Dimensions</div>
+            <div style="font-size: 0.82rem; color: #64748B;">Engagement, Attendance, & Scores</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with c_kpi3:
+        st.markdown(f"""
+        <div class='saas-kpi-card'>
+            <div style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase;">Optimal Learner Segments</div>
+            <div style="font-size: 1.85rem; font-weight: 800; color: #0D9488; margin-top: 4px;">k = {k_clusters} Segments</div>
+            <div style="font-size: 0.82rem; color: #64748B;">Confirmed via Silhouette & Elbow</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # Horizontal Bar Chart of Cohort Share with Faculty Playbook
+    col_chart_share, col_table_play = st.columns([1.2, 1.0], gap="large")
+
+    with col_chart_share:
+        counts = df_c["persona_name"].value_counts().loc[[
+            "Thriving Self-Starter", "Steady Builder", "Quiet Observer", "Support-Priority Learner"
+        ]]
+        pcts = (counts / tot_students) * 100
+
+        fig_bar = go.Figure()
+        fig_bar.add_trace(go.Bar(
+            y=counts.index,
+            x=pcts.values,
+            orientation="h",
+            marker=dict(
+                color=["#10B981", "#2563EB", "#D97706", "#DC2626"],
+                line=dict(color="#CBD5E1", width=1)
+            ),
+            text=[f"{p:.1f}% ({c:,})" for p, c in zip(pcts.values, counts.values)],
+            textposition="auto",
+            textfont=dict(size=11, color="#FFFFFF", family="Inter, sans-serif", weight="bold")
+        ))
+
+        fig_bar.update_layout(
+            paper_bgcolor="#FFFFFF",
+            plot_bgcolor="#FFFFFF",
+            height=280,
+            margin=dict(l=10, r=20, t=10, b=10),
+            xaxis=dict(title="Percentage of Total Cohort (%)", range=[0, 45], gridcolor="#F1F5F9", tickfont=dict(color="#64748B")),
+            yaxis=dict(autorange="reversed", tickfont=dict(size=11, color="#0F172A", family="Inter, sans-serif"))
+        )
+        st.markdown("<div class='saas-card'>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size: 0.95rem; font-weight: 700; color: #0F172A; margin-bottom: 2px;'>Cohort Distribution Across 4 Learner Personas</div>", unsafe_allow_html=True)
+        st.plotly_chart(fig_bar, use_container_width=True, config={"displayModeBar": False})
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with col_table_play:
+        st.markdown("<div class='saas-card' style='height: 100%;'>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size: 0.95rem; font-weight: 700; color: #0F172A; margin-bottom: 8px;'>📋 Recommended Faculty Playbooks</div>", unsafe_allow_html=True)
+        st.markdown("""
+        - **🌟 Thriving Self-Starters (22.4%):** Assign honors research challenges, advanced datasets, and peer-mentorship leadership roles.
+        - **🚀 Steady Builders (37.4%):** Provide intermediate stretch problems and group collaborations to bridge into distinction.
+        - **🔍 Quiet Observers (22.7%):** Deploy automated 48-hour deadline nudges, low-stakes micro-quizzes, and interactive Q&A prompts.
+        - **🛡️ Support-Priority (17.4%):** Trigger mandatory proactive 1-on-1 advisor counseling, prerequisite diagnostics, and simplified task schedules.
+        """)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown("<hr style='border: 0; border-top: 1px solid #E2E8F0; margin: 26px 0 20px 0;'>", unsafe_allow_html=True)
+
+    # -------------------------------------------------------------------------
+    # Section B — Visual Cohort Map (2D PCA Scatter)
+    # -------------------------------------------------------------------------
+    st.markdown("<h4 style='font-size: 1.15rem; color: #0F172A; margin-bottom: 4px;'>B. Visual Cohort Map (2D PCA Unsupervised Projection)</h4>", unsafe_allow_html=True)
+    st.caption(f"Principal Component Analysis captures {pipeline.metrics['pca_total_var']}% total variance (PC1 = {pipeline.metrics['pca_explained_var'][0]}%, PC2 = {pipeline.metrics['pca_explained_var'][1]}%).")
+
+    # Sample for fluid client performance
+    sample_size = min(3000, len(df_c))
+    sample_df = df_c.sample(n=sample_size, random_state=42).copy()
+
+    # Get active student's PCA coordinates
+    active_inputs_tab3 = {
         "weekly_study_activity": float(st.session_state.weekly_study_activity),
         "ontime_assignment_rate": float(st.session_state.ontime_assignment_rate),
         "quiz_test_average": float(st.session_state.quiz_test_average),
         "forum_participation": float(st.session_state.forum_participation),
         "attendance_consistency": float(st.session_state.attendance_consistency)
     }
+    cur_pred = pipeline.predict_student_profile(**active_inputs_tab3)
 
-    student_pred = ml_pipe.predict_student_profile(
-        weekly_study_activity=current_inputs["weekly_study_activity"],
-        ontime_assignment_rate=current_inputs["ontime_assignment_rate"],
-        quiz_test_average=current_inputs["quiz_test_average"],
-        forum_participation=current_inputs["forum_participation"],
-        attendance_consistency=current_inputs["attendance_consistency"]
+    pca_color_map = {
+        "Thriving Self-Starter": "#10B981",
+        "Steady Builder": "#2563EB",
+        "Quiet Observer": "#D97706",
+        "Support-Priority Learner": "#DC2626"
+    }
+
+    fig_pca = px.scatter(
+        sample_df,
+        x="pca_1",
+        y="pca_2",
+        color="persona_name",
+        color_discrete_map=pca_color_map,
+        hover_data=["weighted_avg_score", "total_clicks", "active_days"],
+        labels={"pca_1": f"PC1 ({pipeline.metrics['pca_explained_var'][0]}% Var)", "pca_2": f"PC2 ({pipeline.metrics['pca_explained_var'][1]}% Var)"},
+        opacity=0.60
     )
 
-    persona_info = student_pred["persona"]
-    persona_id = student_pred["persona_id"]
-    readiness = student_pred["readiness_score"]
+    # Overlay active student with large gold star marker
+    fig_pca.add_trace(go.Scatter(
+        x=[cur_pred["pca_x"]],
+        y=[cur_pred["pca_y"]],
+        mode="markers+text",
+        name="★ Current Student",
+        marker=dict(symbol="star", size=22, color="#EAB308", line=dict(color="#0F172A", width=2)),
+        text=["★ Current Student"],
+        textposition="top center",
+        textfont=dict(color="#854D0E", size=13, family="Inter, sans-serif", weight="bold")
+    ))
 
-    feedback = generate_student_feedback(
-        persona_id=persona_id,
-        student_radar=student_pred["student_radar"],
-        readiness_score=readiness
+    fig_pca.update_layout(
+        paper_bgcolor="#FFFFFF",
+        plot_bgcolor="#F8FAFC",
+        height=400,
+        margin=dict(l=20, r=20, t=10, b=10),
+        xaxis=dict(gridcolor="#E2E8F0", zerolinecolor="#CBD5E1"),
+        yaxis=dict(gridcolor="#E2E8F0", zerolinecolor="#CBD5E1"),
+        legend=dict(orientation="h", yanchor="bottom", y=-0.22, xanchor="center", x=0.5, font=dict(color="#334155"))
     )
 
-    # -------------------------------------------------------------------------
-    # Section 2: Personalized Feedback Card & Habit Radar
-    # -------------------------------------------------------------------------
-    st.markdown("#### 🎯 Step 2: Your Personalized Profile & Habit Radar")
+    st.markdown("<div class='saas-card'>", unsafe_allow_html=True)
+    st.plotly_chart(fig_pca, use_container_width=True, config={"displayModeBar": False})
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    col_card, col_radar = st.columns([1.15, 1.0])
+    st.markdown("<hr style='border: 0; border-top: 1px solid #E2E8F0; margin: 26px 0 20px 0;'>", unsafe_allow_html=True)
 
-    with col_card:
-        # Learner Persona Badge Card
-        badge_bg = persona_info["badge_color"]
+    # -------------------------------------------------------------------------
+    # Section C — Statistical & Teacher-Category Validation
+    # -------------------------------------------------------------------------
+    st.markdown("<h4 style='font-size: 1.15rem; color: #0F172A; margin-bottom: 4px;'>C. Statistical & Teacher-Category Validation (Zero Target Leakage)</h4>", unsafe_allow_html=True)
+    st.caption("Proof that unsupervised behavioral segmentation reflects true ground-truth academic outcomes without using labels during training.")
+
+    # 3 Metric Cards with 1-line plain-English explanations
+    m_col1, m_col2, m_col3 = st.columns(3)
+    with m_col1:
         st.markdown(f"""
-        <div class="edu-card">
-            <div class="persona-badge" style="background-color: {badge_bg}22; color: {badge_bg}; border: 1px solid {badge_bg}55;">
-                {persona_info['icon']} {persona_info['name']}
-            </div>
-            <div style="font-size: 1.15rem; font-weight: 600; color: #F1F5F9; margin-bottom: 6px;">
-                {persona_info['tagline']}
-            </div>
-            <p style="font-size: 0.92rem; line-height: 1.5; color: #94A3B8; margin-bottom: 16px;">
-                {persona_info['description']}
-            </p>
-            <div style="margin-top: 10px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <span style="font-size: 0.85rem; font-weight: 600; color: #CBD5E1;">Academic Readiness Score</span>
-                    <span style="font-size: 1.1rem; font-weight: 700; color: {badge_bg};">{readiness}/100</span>
-                </div>
-                <div style="width: 100%; height: 8px; background: #1E293B; border-radius: 4px; overflow: hidden;">
-                    <div style="width: {readiness}%; height: 100%; background: {badge_bg}; border-radius: 4px; transition: width 0.3s ease;"></div>
-                </div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        # Strengths & Opportunities Dual Cards
-        col_str, col_opp = st.columns(2)
-        with col_str:
-            st.markdown(f"""
-            <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 10px; padding: 14px 16px;">
-                <div style="color: #10B981; font-weight: 700; font-size: 0.85rem; margin-bottom: 4px;">
-                    ✨ TOP STRENGTH
-                </div>
-                <div style="font-weight: 600; font-size: 0.95rem; color: #F1F5F9; margin-bottom: 4px;">
-                    {feedback['strength_title']}
-                </div>
-                <p style="font-size: 0.82rem; color: #94A3B8; margin: 0; line-height: 1.4;">
-                    {feedback['strength_text']}
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
-
-        with col_opp:
-            st.markdown(f"""
-            <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 10px; padding: 14px 16px;">
-                <div style="color: #F59E0B; font-weight: 700; font-size: 0.85rem; margin-bottom: 4px;">
-                    🎯 #1 GROWTH GOAL
-                </div>
-                <div style="font-weight: 600; font-size: 0.95rem; color: #F1F5F9; margin-bottom: 4px;">
-                    {feedback['growth_title']}
-                </div>
-                <p style="font-size: 0.82rem; color: #94A3B8; margin: 0; line-height: 1.4;">
-                    {feedback['growth_text']}
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
-
-        # Interactive "What-If" Habit Simulator
-        st.markdown("<br>", unsafe_allow_html=True)
-        with st.container():
-            st.markdown("""
-            <div style="background: #0F172A; border: 1px solid #334155; border-radius: 10px; padding: 14px 18px;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-weight: 700; color: #38BDF8; font-size: 0.92rem;">🔮 Interactive "What-If" Habit Simulator</span>
-                    <span class="metric-pill">Real-Time ML Projection</span>
-                </div>
-                <p style="font-size: 0.82rem; color: #94A3B8; margin: 4px 0 10px 0;">
-                    See what happens to your tier and readiness score if you boost your lowest habit.
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
-
-            growth_key_map = {
-                "Study Activity": "weekly_study_activity",
-                "On-Time Rate": "ontime_assignment_rate",
-                "Quiz & Test Score": "quiz_test_average",
-                "Class Participation": "forum_participation",
-                "Attendance Regularity": "attendance_consistency"
-            }
-            growth_internal_key = growth_key_map.get(feedback["growth_dimension"], "ontime_assignment_rate")
-
-            sim_col1, sim_col2 = st.columns([1.5, 2.5])
-            with sim_col1:
-                boost_val = st.slider(
-                    f"Boost {feedback['growth_title']}:",
-                    min_value=5, max_value=35, value=15, step=5,
-                    format="+%d%%",
-                    key="whatif_slider"
-                )
-
-            sim_result = ml_pipe.simulate_what_if_improvement(
-                base_inputs=current_inputs,
-                boost_dimension=growth_internal_key,
-                boost_percent=float(boost_val)
-            )
-
-            with sim_col2:
-                if sim_result["unlocked_tier"]:
-                    st.success(f"🎉 **Tier Unlock!** Boosting by +{boost_val}% elevates you to **{sim_result['unlocked_tier']}** (+{sim_result['delta_readiness']} readiness points)!")
-                else:
-                    st.info(f"📈 Boosting **{feedback['growth_title']}** by +{boost_val}% raises your readiness to **{sim_result['new_readiness']}/100** (+{sim_result['delta_readiness']} pts). You are {feedback['points_needed']} pts from **{feedback['next_tier_name']}**!")
-
-    with col_radar:
-        st.markdown("""
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-            <span style="font-weight: 700; font-size: 0.95rem; color: #F1F5F9;">📊 5-Dimension Habit Benchmark</span>
-            <span class="metric-pill">Comparative Radar</span>
-        </div>
-        """, unsafe_allow_html=True)
-
-        fig_radar = create_habit_radar_chart(
-            student_radar=student_pred["student_radar"],
-            peer_radar=student_pred["peer_radar"],
-            target_radar=student_pred["target_radar"]
-        )
-        st.plotly_chart(fig_radar, use_container_width=True, config={"displayModeBar": False})
-
-        st.caption(f"💡 **Takeaway:** Your cyan profile highlights strengths in **{feedback['strength_title']}**. Closing the gap on the **{feedback['growth_title']}** axis aligns you with the green target benchmark.")
-
-    # -------------------------------------------------------------------------
-    # Section 3: My 4-Week Actionable Study Roadmap
-    # -------------------------------------------------------------------------
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown("#### 🗓️ Step 3: My 4-Week Actionable Study Roadmap")
-
-    roadmap_data = PERSONA_ROADMAPS[persona_id]
-
-    # Calculate overall task progress
-    total_tasks = sum(len(w["tasks"]) for w in roadmap_data["weeks"])
-    completed_tasks = sum(
-        1 for w in roadmap_data["weeks"] for t in w["tasks"]
-        if st.session_state.roadmap_checkboxes.get(t["id"], False)
-    )
-    progress_pct = int(round((completed_tasks / max(total_tasks, 1)) * 100))
-
-    # Live Roadmap Progress Bar
-    p_col1, p_col2 = st.columns([3, 1])
-    with p_col1:
-        st.markdown(f"**Roadmap Progress:** {completed_tasks} of {total_tasks} tasks completed ({progress_pct}%)")
-        st.progress(progress_pct / 100.0)
-    with p_col2:
-        if progress_pct == 100:
-            st.balloons()
-            st.success("🏆 All 4 weeks finished!")
-        elif progress_pct > 0:
-            st.info(f"🔥 Great momentum! Keep it going.")
-        else:
-            st.caption("Check off items as you complete them:")
-
-    # 4-Week Tabs
-    w_tab1, w_tab2, w_tab3, w_tab4 = st.tabs([
-        f"📅 Week 1",
-        f"📅 Week 2",
-        f"📅 Week 3",
-        f"📅 Week 4"
-    ])
-
-    tabs = [w_tab1, w_tab2, w_tab3, w_tab4]
-
-    for week_idx, week in enumerate(roadmap_data["weeks"]):
-        with tabs[week_idx]:
-            st.markdown(f"**{week['title']}**")
-            st.caption(f"🎯 *Weekly Focus:* {week['focus']}")
-
-            for t in week["tasks"]:
-                tid = t["id"]
-                current_checked = st.session_state.roadmap_checkboxes.get(tid, False)
-
-                col_cb, col_meta = st.columns([4, 1.2])
-                with col_cb:
-                    new_val = st.checkbox(
-                        t["task"],
-                        value=current_checked,
-                        key=f"task_cb_{tid}"
-                    )
-                    st.session_state.roadmap_checkboxes[tid] = new_val
-
-                with col_meta:
-                    st.markdown(f"<span class='metric-pill'>⏱️ {t['hours']}</span> <span class='metric-pill' style='color:#38BDF8;'>🏷️ {t['tag']}</span>", unsafe_allow_html=True)
-
-    # Download Study Plan Buttons
-    st.markdown("<br>", unsafe_allow_html=True)
-    d_col1, d_col2, d_col_spacer = st.columns([1.5, 1.5, 3])
-
-    md_plan = generate_roadmap_markdown(
-        student_name="Student Learner",
-        persona_name=persona_info["name"],
-        readiness_score=readiness,
-        roadmap_weeks=roadmap_data["weeks"],
-        checked_tasks=st.session_state.roadmap_checkboxes
-    )
-
-    csv_plan = generate_roadmap_csv(
-        persona_name=persona_info["name"],
-        roadmap_weeks=roadmap_data["weeks"],
-        checked_tasks=st.session_state.roadmap_checkboxes
-    )
-
-    with d_col1:
-        st.download_button(
-            label="📥 Download Study Plan (.md)",
-            data=md_plan,
-            file_name=f"EduCluster_Study_Plan_{persona_info['short_name']}.md",
-            mime="text/markdown",
-            use_container_width=True
-        )
-
-    with d_col2:
-        st.download_button(
-            label="📊 Download Study Plan (.csv)",
-            data=csv_plan,
-            file_name=f"EduCluster_Study_Plan_{persona_info['short_name']}.csv",
-            mime="text/csv",
-            use_container_width=True
-        )
-
-
-# =============================================================================
-# VIEW 2: FACULTY MENTOR & SIH26036 VALIDATION HUB
-# =============================================================================
-else:
-    st.markdown("#### 🎓 Faculty Mentor & Evaluator Command Center")
-    st.caption("Actionable cohort-level student success monitoring & SIH26036 rigorous empirical validation.")
-
-    f_tab1, f_tab2 = st.tabs([
-        "👥 Cohort Action & Intervention Board (Faculty)",
-        "🔬 SIH26036 Scientific & Outcome Validation (Evaluators)"
-    ])
-
-    # -------------------------------------------------------------------------
-    # Tab 1: Cohort Action & Intervention Board (For Faculty Mentors)
-    # -------------------------------------------------------------------------
-    with f_tab1:
-        st.markdown("##### 📌 Cohort Distribution & Actionable Faculty Playbooks")
-        st.caption("Overview of 14,003 student enrolments segmented into 4 actionable pedagogical intervention tiers.")
-
-        # 4 KPI Summary Cards
-        df_cohort = ml_pipe.df
-        counts = df_cohort["persona_id"].value_counts().sort_index()
-        total_n = len(df_cohort)
-
-        kpi1, kpi2, kpi3, kpi4 = st.columns(4)
-        kpis = [kpi1, kpi2, kpi3, kpi4]
-
-        for p_id in range(4):
-            p_def = PERSONA_DEFINITIONS[p_id]
-            cnt = counts.get(p_id, 0)
-            pct = (cnt / total_n) * 100
-            score_avg = df_cohort[df_cohort["persona_id"] == p_id]["weighted_avg_score"].mean()
-
-            with kpis[p_id]:
-                st.markdown(f"""
-                <div class="edu-card" style="border-top: 3px solid {p_def['badge_color']};">
-                    <div style="font-size: 0.82rem; font-weight: 700; color: {p_def['badge_color']}; text-transform: uppercase;">
-                        {p_def['priority']}
-                    </div>
-                    <div style="font-size: 1.1rem; font-weight: 700; color: #F8FAFC; margin: 4px 0;">
-                        {p_def['icon']} {p_def['name']}
-                    </div>
-                    <div style="font-size: 1.6rem; font-weight: 800; color: #F1F5F9;">
-                        {cnt:,} <span style="font-size: 0.9rem; color: #94A3B8; font-weight: 500;">({pct:.1f}%)</span>
-                    </div>
-                    <div style="font-size: 0.8rem; color: #CBD5E1; margin-top: 4px;">
-                        Avg Score: <b>{score_avg:.1f}%</b> • {p_def['risk_level']}
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-
-        # Faculty Playbook Guidance
-        with st.expander("📘 **Actionable Faculty Playbook (Intervention Guidelines by Persona)**", expanded=True):
-            pb_col1, pb_col2 = st.columns(2)
-            with pb_col1:
-                st.markdown(f"""
-                **🛡️ Support-Priority Learners ({counts.get(3, 0):,} Students — Immediate Scaffolding)**
-                - **Primary Trigger:** Missed initial assessment or consecutive submission delay > 7 days.
-                - **Faculty Action:** Automated calendar link for 1-on-1 advisor counseling, diagnostic prerequisite check, simplified task checklists.
-                
-                **🔍 Quiet Observers ({counts.get(2, 0):,} Students — Consistency & Pacing)**
-                - **Primary Trigger:** High scores on tests but platform clicks in lowest quartile (< 500 total clicks).
-                - **Faculty Action:** Automated mid-week push reminders 48h before deadlines, low-stakes micro-quizzes, and interactive forum prompts.
-                """)
-            with pb_col2:
-                st.markdown(f"""
-                **🚀 Steady Builders ({counts.get(1, 0):,} Students — Skill Expansion)**
-                - **Primary Trigger:** Regular weekly attendance, solid 70%+ scores, ready for stretch material.
-                - **Faculty Action:** Guided intermediate stretch labs, peer problem circles, mock timed challenges.
-                
-                **🌟 Thriving Self-Starters ({counts.get(0, 0):,} Students — Leadership & Honors)**
-                - **Primary Trigger:** Consistent top 10% scores (>85%), early submissions, high resource exploration.
-                - **Faculty Action:** Honors challenge problems, undergraduate research opportunities, peer-mentor leadership roles.
-                """)
-
-        # Interactive Cohort Map (2D PCA Scatter)
-        st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("##### 🗺️ Interactive Cohort Map (2D PCA Unsupervised Projection)")
-        st.caption(f"Principal Component Analysis (Total Explained Variance: {ml_pipe.metrics['pca_total_var']}%) showing all 14,003 students. Gold star shows active simulated student.")
-
-        # Re-compute current active student coordinates
-        current_inputs = {
-            "weekly_study_activity": float(st.session_state.weekly_study_activity),
-            "ontime_assignment_rate": float(st.session_state.ontime_assignment_rate),
-            "quiz_test_average": float(st.session_state.quiz_test_average),
-            "forum_participation": float(st.session_state.forum_participation),
-            "attendance_consistency": float(st.session_state.attendance_consistency)
-        }
-        active_student = ml_pipe.predict_student_profile(**current_inputs)
-
-        # Downsample background scatter for snappy rendering
-        sample_df = df_cohort.sample(n=min(3000, len(df_cohort)), random_state=42).copy()
-
-        color_map = {
-            "Thriving Self-Starter": "#10B981",
-            "Steady Builder": "#38BDF8",
-            "Quiet Observer": "#F59E0B",
-            "Support-Priority Learner": "#EF4444"
-        }
-
-        fig_pca = px.scatter(
-            sample_df,
-            x="pca_1",
-            y="pca_2",
-            color="persona_name",
-            color_discrete_map=color_map,
-            hover_data=["weighted_avg_score", "total_clicks", "active_days"],
-            labels={"pca_1": f"PC1 ({ml_pipe.metrics['pca_explained_var'][0]}% Var)", "pca_2": f"PC2 ({ml_pipe.metrics['pca_explained_var'][1]}% Var)"},
-            opacity=0.65
-        )
-
-        # Add Gold Star Marker for the active simulated student
-        fig_pca.add_trace(go.Scatter(
-            x=[active_student["pca_x"]],
-            y=[active_student["pca_y"]],
-            mode="markers+text",
-            name="Current Active Student",
-            marker=dict(symbol="star", size=20, color="#FACC15", line=dict(color="#FFFFFF", width=2)),
-            text=["★ Active Student"],
-            textposition="top center",
-            textfont=dict(color="#FACC15", size=13, family="Inter, sans-serif")
-        ))
-
-        fig_pca.update_layout(
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(17, 24, 39, 0.7)",
-            legend=dict(orientation="h", yanchor="bottom", y=-0.22, xanchor="center", x=0.5, font=dict(color="#CBD5E1")),
-            margin=dict(l=20, r=20, t=20, b=30),
-            height=460,
-            xaxis=dict(gridcolor="#1E293B", zerolinecolor="#334155"),
-            yaxis=dict(gridcolor="#1E293B", zerolinecolor="#334155")
-        )
-
-        st.plotly_chart(fig_pca, use_container_width=True)
-
-    # -------------------------------------------------------------------------
-    # Tab 2: SIH26036 Scientific Validation Hub (For Hackathon Judges)
-    # -------------------------------------------------------------------------
-    with f_tab2:
-        st.markdown("##### 🔬 SIH26036 Scientific & Extrinsic Category Validation")
-        st.markdown("""
-        <div class="edu-card-highlight">
-            <span style="font-weight: 700; color: #38BDF8; font-size: 0.95rem;">🔒 Zero Target Leakage Methodology</span>
-            <p style="font-size: 0.88rem; color: #CBD5E1; margin: 4px 0 0 0; line-height: 1.5;">
-                In strict adherence to unsupervised learning principles, <code>final_result</code> was quarantined entirely during model training.
-                K-Means was fitted strictly on 16 behavioral features across 14,003 enrolments. Extrinsic validation proves clusters naturally reconstruct academic outcomes with very high statistical significance.
+        <div class='saas-kpi-card'>
+            <div style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase;">Silhouette Score</div>
+            <div style="font-size: 1.85rem; font-weight: 800; color: #0F172A; margin-top: 4px;">{pipeline.metrics['silhouette']}</div>
+            <div style="font-size: 0.82rem; color: #166534; font-weight: 600; margin-top: 2px;">Cohesive Clusters (~0.421)</div>
+            <p style="font-size: 0.80rem; color: #64748B; margin: 4px 0 0 0; line-height: 1.35;">
+                Confirms mathematically dense clusters with distinct boundaries and minimal overlap.
             </p>
         </div>
         """, unsafe_allow_html=True)
 
-        v_metric1, v_metric2, v_metric3, v_metric4 = st.columns(4)
-        with v_metric1:
-            st.metric("Silhouette Score (k=4)", f"{ml_pipe.metrics['silhouette']}", help="Measures cluster cohesion vs separation (Benchmark ~0.421)")
-        with v_metric2:
-            st.metric("Cramér's V (Effect Size)", f"{ml_pipe.metrics['cramers_v']}", help="Measures association strength with final_result (0.537 = very strong)")
-        with v_metric3:
-            st.metric("Normalized Mutual Info", f"{ml_pipe.metrics['nmi']}", help="Non-linear shared information between clusters and ground-truth (~0.310)")
-        with v_metric4:
-            st.metric("Chi-Square Stat (χ²)", f"{ml_pipe.metrics['chi2']:,}", help=f"p-value < 0.0001 (Null hypothesis of independence decisively rejected)")
+    with m_col2:
+        st.markdown(f"""
+        <div class='saas-kpi-card'>
+            <div style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase;">Normalized Mutual Info (NMI)</div>
+            <div style="font-size: 1.85rem; font-weight: 800; color: #2563EB; margin-top: 4px;">{pipeline.metrics['nmi']}</div>
+            <div style="font-size: 0.82rem; color: #1E40AF; font-weight: 600; margin-top: 2px;">Strong Outcome Alignment (~0.310)</div>
+            <p style="font-size: 0.80rem; color: #64748B; margin: 4px 0 0 0; line-height: 1.35;">
+                Proves high shared information between discovered clusters and teacher-assigned grades.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
 
-        st.markdown("<br>", unsafe_allow_html=True)
+    with m_col3:
+        st.markdown(f"""
+        <div class='saas-kpi-card'>
+            <div style="font-size: 0.78rem; font-weight: 700; color: #64748B; text-transform: uppercase;">Cramér's V (Effect Size)</div>
+            <div style="font-size: 1.85rem; font-weight: 800; color: #0D9488; margin-top: 4px;">{pipeline.metrics['cramers_v']}</div>
+            <div style="font-size: 0.82rem; color: #0F766E; font-weight: 600; margin-top: 2px;">Very Strong Association (~0.537)</div>
+            <p style="font-size: 0.80rem; color: #64748B; margin: 4px 0 0 0; line-height: 1.35;">
+                χ² = 11,833.21 (p < 0.0001) decisively rejects random assignment null hypothesis.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
 
-        # Step 1: 16 Feature Summary Table
-        st.markdown("###### **Step 1 Verification: 16 Compiled Behavioral Features Across 3 Pillars**")
-        feature_rows = []
-        for domain, feats in FEATURE_DOMAINS.items():
-            for f in feats:
-                feature_rows.append({
-                    "Pillar": domain,
-                    "Feature Name": f,
-                    "Type": "Log-Transformed" if f in ["total_clicks", "forum_clicks", "quiz_clicks", "resource_clicks", "oucontent_clicks", "pre_course_clicks"] else "Linear Scale",
-                    "Description": f.replace("_", " ").title(),
-                    "Cohort Mean": f"{df_cohort[f].mean():.2f}"
-                })
-        feat_df = pd.DataFrame(feature_rows)
-        st.dataframe(feat_df, use_container_width=True, hide_index=True)
+    st.markdown("<br>", unsafe_allow_html=True)
 
-        st.markdown("<br>", unsafe_allow_html=True)
-        col_sweep, col_ct = st.columns(2)
+    # Contingency Heatmap Card
+    st.markdown("<div class='saas-card'>", unsafe_allow_html=True)
+    st.markdown("<div style='font-size: 0.95rem; font-weight: 700; color: #0F172A; margin-bottom: 4px;'>Ground-Truth Outcome Contingency Matrix</div>", unsafe_allow_html=True)
+    st.caption("Distribution of ground-truth teacher grades (Distinction, Pass, Fail, Withdrawn) across the 4 unsupervised learner segments:")
 
-        # Step 2: Elbow & Silhouette Plot
-        with col_sweep:
-            st.markdown("###### **Step 2 Verification: Hyperparameter k-Sweep (Elbow vs Silhouette)**")
-            
-            k_vals = list(range(2, 9))
-            inertias = [82400, 58100, 41757, 34200, 28900, 25100, 22400]
-            silhouettes = [0.495, 0.442, 0.427, 0.381, 0.354, 0.332, 0.315]
-
-            fig_sweep = go.Figure()
-            # Inertia line
-            fig_sweep.add_trace(go.Scatter(
-                x=k_vals, y=inertias,
-                name="Inertia (Elbow)",
-                mode="lines+markers",
-                line=dict(color="#38BDF8", width=3),
-                yaxis="y1"
-            ))
-            # Silhouette line
-            fig_sweep.add_trace(go.Scatter(
-                x=k_vals, y=silhouettes,
-                name="Silhouette Score",
-                mode="lines+markers",
-                line=dict(color="#10B981", width=3, dash="dot"),
-                yaxis="y2"
-            ))
-
-            fig_sweep.add_vline(x=4, line_width=2, line_dash="dash", line_color="#F59E0B")
-
-            fig_sweep.update_layout(
-                paper_bgcolor="rgba(0,0,0,0)",
-                plot_bgcolor="rgba(17, 24, 39, 0.7)",
-                xaxis=dict(title="Number of Clusters (k)", gridcolor="#1E293B", tickvals=k_vals),
-                yaxis=dict(title="Inertia", gridcolor="#1E293B", titlefont=dict(color="#38BDF8")),
-                yaxis2=dict(title="Silhouette Score", overlaying="y", side="right", titlefont=dict(color="#10B981"), range=[0.25, 0.55]),
-                legend=dict(orientation="h", yanchor="bottom", y=-0.28, xanchor="center", x=0.5, font=dict(color="#CBD5E1")),
-                margin=dict(l=30, r=30, t=20, b=30),
-                height=340
-            )
-            st.plotly_chart(fig_sweep, use_container_width=True)
-            st.caption("k=4 provides the optimal balance: marked inertia inflection while separating steady planners from deadline crammers.")
-
-        # Step 3: Contingency Matrix Heatmap
-        with col_ct:
-            st.markdown("###### **Step 3 Verification: Ground-Truth Outcome Contingency Heatmap**")
-            
-            ct_matrix = ml_pipe.metrics["contingency_matrix"]
-
-            fig_hm = px.imshow(
-                ct_matrix,
-                labels=dict(x="Ground-Truth Outcome", y="Learner Persona", color="Students"),
-                x=ct_matrix.columns,
-                y=ct_matrix.index,
-                text_auto=True,
-                color_continuous_scale="Blues",
-                aspect="auto"
-            )
-            fig_hm.update_layout(
-                paper_bgcolor="rgba(0,0,0,0)",
-                plot_bgcolor="rgba(0,0,0,0)",
-                margin=dict(l=20, r=20, t=20, b=20),
-                height=340,
-                coloraxis_showscale=False
-            )
-            st.plotly_chart(fig_hm, use_container_width=True)
-            st.caption("Contingency alignment proves zero target leakage: Thriving Self-Starters achieve 96.9% Distinction/Pass rate, while Support-Priority captures 96.7% Non-completion rate.")
+    ct = pipeline.metrics["contingency_matrix"]
+    fig_hm = px.imshow(
+        ct,
+        labels=dict(x="Teacher-Assigned Grade", y="Learner Persona", color="Students"),
+        x=ct.columns,
+        y=ct.index,
+        text_auto=True,
+        color_continuous_scale="Blues",
+        aspect="auto"
+    )
+    fig_hm.update_layout(
+        paper_bgcolor="#FFFFFF",
+        plot_bgcolor="#FFFFFF",
+        height=320,
+        margin=dict(l=20, r=20, t=10, b=10),
+        coloraxis_showscale=False
+    )
+    st.plotly_chart(fig_hm, use_container_width=True, config={"displayModeBar": False})
+    st.markdown("""
+    <div style="font-size: 0.84rem; color: #475569; line-height: 1.45; margin-top: 6px;">
+        <b>Key Takeaway:</b> 96.9% of Thriving Self-Starters achieve Distinction or Pass, while 96.7% of Support-Priority Learners represent Fail or Withdrawn outcomes. This validates that behavioral telemetry successfully reconstructs academic trajectories without label contamination.
+    </div>
+    """, unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
-# 5. Footer
+# 6. Subtle Product Footer
 # -----------------------------------------------------------------------------
-st.markdown("<br><hr style='border: 0; border-top: 1px solid #1E293B; margin: 30px 0 16px 0;'>", unsafe_allow_html=True)
-col_foot1, col_foot2 = st.columns([2, 1])
-with col_foot1:
-    st.caption("EduCluster ML • Candidate: Parasa Bhavyaswi (Reg No: 12502256) • Supervisor: Dr. Bhupinder Singh, Professor")
-    st.caption("School of Computer Science & Engineering, Lovely Professional University, Phagwara, Punjab, India")
-with col_foot2:
-    st.caption("Smart India Hackathon (SIH26036) • Open University Learning Analytics Dataset (OULAD)")
+st.markdown("<hr style='border: 0; border-top: 1px solid #E2E8F0; margin: 36px 0 16px 0;'>", unsafe_allow_html=True)
+foot_col1, foot_col2 = st.columns([2, 1])
+with foot_col1:
+    st.markdown("<span style='font-size: 0.85rem; color: #64748B;'>EduCluster — Personalized Learning Path Engine</span>", unsafe_allow_html=True)
+with foot_col2:
+    st.markdown("<div style='text-align: right;'><span style='font-size: 0.82rem; color: #94A3B8;'>Production SaaS Ready • SIH26036</span></div>", unsafe_allow_html=True)
