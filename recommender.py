@@ -22,6 +22,11 @@ DEMO_PRESETS = {
     "topper": {
         "label": "🌟 Regular Topper",
         "description": "Consistent study rhythm, punctual submissions, and high mastery.",
+        "total_clicks": 85.0,
+        "on_time_rate": 95.0,
+        "avg_score": 88.0,
+        "forum_clicks": 72.0,
+        "active_days": 92.0,
         "weekly_study_activity": 85.0,
         "ontime_assignment_rate": 95.0,
         "quiz_test_average": 88.0,
@@ -31,6 +36,11 @@ DEMO_PRESETS = {
     "crammer": {
         "label": "⚡ Deadline Crammer",
         "description": "High test ability, but concentrated study bursts and deadline delays.",
+        "total_clicks": 42.0,
+        "on_time_rate": 55.0,
+        "avg_score": 72.0,
+        "forum_clicks": 28.0,
+        "active_days": 52.0,
         "weekly_study_activity": 42.0,
         "ontime_assignment_rate": 55.0,
         "quiz_test_average": 72.0,
@@ -40,6 +50,11 @@ DEMO_PRESETS = {
     "quiet": {
         "label": "🎧 Quiet Portal User",
         "description": "Capable foundation, but minimal platform clicks and passive habits.",
+        "total_clicks": 24.0,
+        "on_time_rate": 50.0,
+        "avg_score": 54.0,
+        "forum_clicks": 15.0,
+        "active_days": 36.0,
         "weekly_study_activity": 24.0,
         "ontime_assignment_rate": 50.0,
         "quiz_test_average": 54.0,
@@ -49,6 +64,11 @@ DEMO_PRESETS = {
     "behind": {
         "label": "🆘 Falling Behind",
         "description": "Overdue submissions, missed lectures, and struggling test confidence.",
+        "total_clicks": 14.0,
+        "on_time_rate": 20.0,
+        "avg_score": 28.0,
+        "forum_clicks": 8.0,
+        "active_days": 16.0,
         "weekly_study_activity": 14.0,
         "ontime_assignment_rate": 20.0,
         "quiz_test_average": 28.0,
@@ -58,11 +78,16 @@ DEMO_PRESETS = {
 }
 
 DIMENSION_LABELS = {
-    "weekly_study_activity": "Weekly Study Activity",
-    "ontime_assignment_rate": "On-Time Submissions",
-    "quiz_test_average": "Quiz & Test Score",
-    "forum_participation": "Class Participation",
-    "attendance_consistency": "Attendance Regularity"
+    "total_clicks": "Total VLE Clicks",
+    "on_time_rate": "On-Time Submissions (%)",
+    "avg_score": "Assessment Score (%)",
+    "forum_clicks": "Forum Activity (%)",
+    "active_days": "Active Study Days (%)",
+    "weekly_study_activity": "Total VLE Clicks",
+    "ontime_assignment_rate": "On-Time Submissions (%)",
+    "quiz_test_average": "Assessment Score (%)",
+    "forum_participation": "Forum Activity (%)",
+    "attendance_consistency": "Active Study Days (%)"
 }
 
 TIER_COLORS = {
@@ -81,6 +106,11 @@ TIER_COLORS = {
 }
 
 STRENGTH_INSIGHTS = {
+    "total_clicks": ("Deep Exploration Habits", "You spend quality time reviewing digital learning modules and reference assets."),
+    "on_time_rate": ("Punctual Coursework Pacing", "Your discipline in beating deadlines prevents backlogs and reduces cognitive stress."),
+    "avg_score": ("High Conceptual Grasp", "You absorb core concepts effectively and solve exam-style problems with confidence."),
+    "forum_clicks": ("Active Collaboration", "You communicate proactively, asking questions and engaging in peer discussion circles."),
+    "active_days": ("Reliable Weekly Rhythm", "Your consistent weekly attendance creates a solid operational foundation for long-term retention."),
     "quiz_test_average": ("High Conceptual Grasp", "You absorb core concepts effectively and solve exam-style problems with confidence."),
     "ontime_assignment_rate": ("Punctual Coursework Pacing", "Your discipline in beating deadlines prevents backlogs and reduces cognitive stress."),
     "attendance_consistency": ("Reliable Weekly Rhythm", "Your consistent weekly attendance creates a solid operational foundation for long-term retention."),
@@ -89,6 +119,11 @@ STRENGTH_INSIGHTS = {
 }
 
 GROWTH_INSIGHTS = {
+    "total_clicks": ("Active Portal Engagement", "Complement lecture notes with interactive digital simulations and practice problem sets."),
+    "on_time_rate": ("Advance Buffer Scheduling", "Set a personal deadline 48 hours prior to official due dates to eliminate rush errors."),
+    "avg_score": ("Foundational Recall & Practice", "Work through short self-check practice problem sets to solidify core test accuracy."),
+    "forum_clicks": ("Peer Q&A Participation", "Post one clarifying question weekly on discussion boards to build shared accountability."),
+    "active_days": ("Daily Micro-Habits", "Aim for a dependable 30-minute study routine on weekdays instead of irregular weekend marathons."),
     "quiz_test_average": ("Foundational Recall & Practice", "Work through short self-check practice problem sets to solidify core test accuracy."),
     "ontime_assignment_rate": ("Advance Buffer Scheduling", "Set a personal deadline 48 hours prior to official due dates to eliminate rush errors."),
     "attendance_consistency": ("Daily Micro-Habits", "Aim for a dependable 30-minute study routine on weekdays instead of irregular weekend marathons."),
@@ -212,21 +247,20 @@ def create_comparison_chart(inputs: Dict[str, float]) -> go.Figure:
     comparing 'Your Current Habits' vs 'Top-Performer Target'.
     """
     labels = [
-        "Study Activity",
-        "On-Time Rate",
-        "Quiz & Test",
-        "Participation",
-        "Attendance"
+        "Total VLE Clicks",
+        "On-Time Submissions (%)",
+        "Assessment Score (%)",
+        "Forum Activity (%)",
+        "Active Study Days (%)"
     ]
-    keys = [
-        "weekly_study_activity",
-        "ontime_assignment_rate",
-        "quiz_test_average",
-        "forum_participation",
-        "attendance_consistency"
+    key_pairs = [
+        ("total_clicks", "weekly_study_activity"),
+        ("on_time_rate", "ontime_assignment_rate"),
+        ("avg_score", "quiz_test_average"),
+        ("forum_clicks", "forum_participation"),
+        ("active_days", "attendance_consistency")
     ]
-
-    student_vals = [inputs[k] for k in keys]
+    student_vals = [float(inputs.get(k1, inputs.get(k2, 50.0))) for k1, k2 in key_pairs]
     target_vals = [88.0, 95.0, 90.0, 80.0, 92.0]
 
     fig = go.Figure()
