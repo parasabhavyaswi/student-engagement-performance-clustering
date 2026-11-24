@@ -1,25 +1,23 @@
 """
-recommender.py - SaaS Recommender & Study Roadmap Engine for EduCluster
-Client-Ready EdTech SaaS Product Architecture
+recommender.py - SaaS Recommender & Dynamic Personalization Engine for EduCluster
+Client-Ready SaaS Product Architecture
 
 Features:
 1. Quick Demo Presets: "Regular Topper", "Deadline Crammer", "Quiet Portal User", "Falling Behind".
-2. Empathetic Strengths & Focus Area synthesis (Plain-English, zero jargon).
-3. Clean Comparison Chart (Plotly Grouped Bar & Radar) with light-theme executive styling.
-4. Live "What-If" Habit Insight Calculator: Identifies the exact single habit change for maximum tier leap.
-5. 4-Week Actionable Study Roadmap (2x2 Grid):
-   - Week 1: Habit & Schedule Reset
-   - Week 2: Core Concept Practice
-   - Week 3: Active Recall & Quiz Sprint
-   - Week 4: Exam & Assessment Mastery
-6. Personal Study Plan Markdown (.md) Export.
+2. Diagnosis & Executive Strength / Focus Area Synthesis (HTML-safe strong tags).
+3. Circular Readiness Gauge (Plotly Indicator) color-coded dynamically by persona tier.
+4. Clean Horizontal Comparison Chart comparing student habits vs top-performer targets.
+5. Two-Layer Dynamic Study Plan Generator:
+   - Layer 1: Persona Tier Strategy (Self-Starter, Steady Builder, Quiet Observer, Support Priority).
+   - Layer 2: Weakest-Habit Injection referencing exact slider percentages (curr% -> target%).
+6. Markdown Plan Export.
 """
 
 from typing import Dict, Any, List, Tuple
 import pandas as pd
 import plotly.graph_objects as go
 
-# 4 Clean Demo Presets matching client-ready SaaS specifications
+# 4 Clean Demo Presets
 DEMO_PRESETS = {
     "topper": {
         "label": "🌟 Regular Topper",
@@ -59,7 +57,6 @@ DEMO_PRESETS = {
     }
 }
 
-# Plain-English Dimension Titles
 DIMENSION_LABELS = {
     "weekly_study_activity": "Weekly Study Activity",
     "ontime_assignment_rate": "On-Time Submissions",
@@ -68,7 +65,13 @@ DIMENSION_LABELS = {
     "attendance_consistency": "Attendance Regularity"
 }
 
-# Client-friendly Strengths & Opportunities
+TIER_COLORS = {
+    0: "#059669",  # Emerald (Thriving Self-Starter)
+    1: "#2563EB",  # Royal Blue (Steady Builder)
+    2: "#D97706",  # Amber (Quiet Observer)
+    3: "#DC2626"   # Coral Red (Support-Priority Learner)
+}
+
 STRENGTH_INSIGHTS = {
     "quiz_test_average": ("High Conceptual Grasp", "You absorb core concepts effectively and solve exam-style problems with confidence."),
     "ontime_assignment_rate": ("Punctual Coursework Pacing", "Your discipline in beating deadlines prevents backlogs and reduces cognitive stress."),
@@ -93,9 +96,8 @@ def diagnose_student_profile(
 ) -> Dict[str, Any]:
     """
     Synthesizes executive diagnosis: Top Strength, #1 Focus Area,
-    and single highest-impact What-If improvement recommendation.
+    and single highest-impact What-If improvement recommendation with HTML-safe tags.
     """
-    # Identify best and lowest dimensions
     sorted_items = sorted(inputs.items(), key=lambda x: x[1], reverse=True)
     best_key, best_val = sorted_items[0]
     worst_key, worst_val = sorted_items[-1]
@@ -103,7 +105,6 @@ def diagnose_student_profile(
     str_title, str_desc = STRENGTH_INSIGHTS.get(best_key, ("Consistent Effort", "Balanced habit portfolio."))
     focus_title, focus_desc = GROWTH_INSIGHTS.get(worst_key, ("Pacing Improvement", "Targeted growth opportunity."))
 
-    # Calculate optimal what-if leap
     target_boost = min(100.0, worst_val + 25.0)
     delta_pts = int(round(0.25 * (target_boost - worst_val)))
 
@@ -116,17 +117,19 @@ def diagnose_student_profile(
     next_tier_name, next_tier_score = tier_targets.get(persona_id, ("Top Mastery", 95))
     pts_to_next = max(1, next_tier_score - readiness_score)
 
+    dim_label = DIMENSION_LABELS.get(worst_key, worst_key)
+
     if readiness_score + delta_pts >= next_tier_score and persona_id > 0:
         whatif_summary = (
-            f"Raising **{DIMENSION_LABELS[worst_key]}** from **{int(worst_val)}%** to **{int(target_boost)}%** (+25%) "
-            f"elevates your readiness to **{readiness_score + delta_pts}/100** (+{delta_pts} pts) and "
-            f"unlocks the **{next_tier_name}** tier!"
+            f"Raising <strong>{dim_label}</strong> from <strong>{int(worst_val)}%</strong> to <strong>{int(target_boost)}%</strong> (+25%) "
+            f"elevates your readiness to <strong>{readiness_score + delta_pts}/100</strong> (+{delta_pts} pts) and "
+            f"unlocks the <strong>{next_tier_name}</strong> tier!"
         )
     else:
         whatif_summary = (
-            f"Raising **{DIMENSION_LABELS[worst_key]}** from **{int(worst_val)}%** to **{int(target_boost)}%** (+25%) "
-            f"boosts your Academic Readiness by **+{delta_pts} points** to **{readiness_score + delta_pts}/100**. "
-            f"You will be just **{max(1, pts_to_next - delta_pts)} pts** away from **{next_tier_name}**."
+            f"Raising <strong>{dim_label}</strong> from <strong>{int(worst_val)}%</strong> to <strong>{int(target_boost)}%</strong> (+25%) "
+            f"boosts your Academic Readiness by <strong>+{delta_pts} points</strong> to <strong>{readiness_score + delta_pts}/100</strong>. "
+            f"You will be just <strong>{max(1, pts_to_next - delta_pts)} pts</strong> away from <strong>{next_tier_name}</strong>."
         )
 
     return {
@@ -140,15 +143,64 @@ def diagnose_student_profile(
         "worst_val": int(worst_val),
         "whatif_summary": whatif_summary,
         "next_tier_name": next_tier_name,
-        "pts_to_next": pts_to_next
+        "pts_to_next": pts_to_next,
+        "tier_color": TIER_COLORS.get(persona_id, "#2563EB")
     }
+
+
+def create_readiness_gauge(readiness_score: int, persona_id: int) -> go.Figure:
+    """
+    Renders a circular Plotly Indicator gauge color-coded dynamically by learner tier.
+    """
+    color = TIER_COLORS.get(persona_id, "#2563EB")
+
+    fig = go.Figure(go.Indicator(
+        mode="gauge+number",
+        value=readiness_score,
+        domain={"x": [0, 1], "y": [0, 1]},
+        number={
+            "suffix": "%",
+            "font": {"size": 32, "color": "#0F172A", "family": "Inter, sans-serif"}
+        },
+        gauge={
+            "axis": {
+                "range": [0, 100],
+                "tickwidth": 1,
+                "tickcolor": "#CBD5E1",
+                "tickvals": [0, 25, 50, 75, 100],
+                "tickfont": {"size": 9, "color": "#64748B"}
+            },
+            "bar": {"color": color, "thickness": 0.28},
+            "bgcolor": "#F8FAFC",
+            "borderwidth": 1,
+            "bordercolor": "#E2E8F0",
+            "steps": [
+                {"range": [0, 35], "color": "#FEE2E2"},
+                {"range": [35, 60], "color": "#FEF3C7"},
+                {"range": [60, 80], "color": "#E0F2FE"},
+                {"range": [80, 100], "color": "#D1FAE5"}
+            ],
+            "threshold": {
+                "line": {"color": color, "width": 4},
+                "thickness": 0.8,
+                "value": readiness_score
+            }
+        }
+    ))
+
+    fig.update_layout(
+        paper_bgcolor="#FFFFFF",
+        plot_bgcolor="#FFFFFF",
+        height=190,
+        margin=dict(l=15, r=15, t=10, b=10)
+    )
+    return fig
 
 
 def create_comparison_chart(inputs: Dict[str, float]) -> go.Figure:
     """
-    Creates a clean, executive grouped bar comparison chart designed
-    specifically for the polished light theme (#FFFFFF card surface).
-    Compares 'Your Current Habits' vs 'Top-Performer Target' with zero overlap.
+    Creates a clean, horizontal grouped comparison bar chart with smooth bars
+    comparing 'Your Current Habits' vs 'Top-Performer Target'.
     """
     labels = [
         "Study Activity",
@@ -166,50 +218,53 @@ def create_comparison_chart(inputs: Dict[str, float]) -> go.Figure:
     ]
 
     student_vals = [inputs[k] for k in keys]
-    target_vals = [88.0, 95.0, 90.0, 80.0, 92.0]  # Thriving Self-Starter benchmark
+    target_vals = [88.0, 95.0, 90.0, 80.0, 92.0]
 
     fig = go.Figure()
 
-    # Target Benchmark (Soft slate background bars)
+    # Target Benchmark (Clean soft slate outline bars)
     fig.add_trace(go.Bar(
-        x=labels,
-        y=target_vals,
+        y=labels,
+        x=target_vals,
         name="Top-Performer Target",
-        marker=dict(color="#E2E8F0", line=dict(color="#CBD5E1", width=1)),
+        orientation="h",
+        marker=dict(color="#F1F5F9", line=dict(color="#CBD5E1", width=1.2)),
         text=[f"{int(v)}%" for v in target_vals],
         textposition="outside",
-        textfont=dict(size=11, color="#64748B", family="Inter, sans-serif")
+        textfont=dict(size=10, color="#64748B", family="Inter, sans-serif")
     ))
 
     # Your Current Habits (Royal Blue highlight bars)
     fig.add_trace(go.Bar(
-        x=labels,
-        y=student_vals,
+        y=labels,
+        x=student_vals,
         name="Your Current Habits",
-        marker=dict(color="#2563EB", line=dict(color="#1D4ED8", width=1.5)),
+        orientation="h",
+        marker=dict(color="#2563EB", line=dict(color="#1D4ED8", width=1)),
         text=[f"{int(v)}%" for v in student_vals],
         textposition="inside",
-        textfont=dict(size=11, color="#FFFFFF", family="Inter, sans-serif", weight="bold")
+        textfont=dict(size=10, color="#FFFFFF", family="Inter, sans-serif", weight="bold")
     ))
 
     fig.update_layout(
         barmode="group",
-        bargap=0.25,
-        bargroupgap=0.1,
+        bargap=0.20,
+        bargroupgap=0.08,
         paper_bgcolor="#FFFFFF",
         plot_bgcolor="#FFFFFF",
-        margin=dict(l=10, r=10, t=10, b=10),
-        height=320,
-        yaxis=dict(
-            range=[0, 115],
+        height=260,
+        margin=dict(l=10, r=30, t=10, b=10),
+        xaxis=dict(
+            range=[0, 112],
             tickvals=[0, 25, 50, 75, 100],
             ticktext=["0%", "25%", "50%", "75%", "100%"],
-            tickfont=dict(size=10, color="#64748B"),
-            gridcolor="#F1F5F9",
+            tickfont=dict(size=9, color="#64748B"),
+            gridcolor="#F8FAFC",
             zeroline=False
         ),
-        xaxis=dict(
-            tickfont=dict(size=11, color="#0F172A", family="Inter, sans-serif"),
+        yaxis=dict(
+            autorange="reversed",
+            tickfont=dict(size=10, color="#0F172A", family="Inter, sans-serif"),
             linecolor="#E2E8F0"
         ),
         legend=dict(
@@ -218,197 +273,192 @@ def create_comparison_chart(inputs: Dict[str, float]) -> go.Figure:
             y=1.02,
             xanchor="right",
             x=1.0,
-            font=dict(size=11, color="#334155")
+            font=dict(size=10, color="#334155")
         )
     )
 
     return fig
 
 
-# Tailored 4-Week Study Plans structured in 4 clean themes
-STUDY_PLAN_TEMPLATES = {
-    0: {  # Thriving Self-Starter
-        "weeks": [
-            {
-                "week_num": 1,
-                "title": "Week 1: Habit & Schedule Reset",
-                "tagline": "Prerequisite fast-tracking & honors elective selection",
-                "tasks": [
-                    {"id": "c0_w1_1", "task": "Accelerate through foundational unit refresh via diagnostic quiz.", "time": "2.0 hrs", "type": "Self-Directed"},
-                    {"id": "c0_w1_2", "task": "Select advanced case problem (real-world dataset modeling).", "time": "3.0 hrs", "type": "Honors Lab"},
-                    {"id": "c0_w1_3", "task": "Confirm weekly research advisory office-hour slot.", "time": "1.0 hr", "type": "Faculty Sync"}
-                ]
-            },
-            {
-                "week_num": 2,
-                "title": "Week 2: Core Concept Practice",
-                "tagline": "Independent algorithmic modeling & deep inquiry",
-                "tasks": [
-                    {"id": "c0_w2_1", "task": "Implement algorithmic benchmarking on honors capstone dataset.", "time": "3.5 hrs", "type": "Deep Inquiry"},
-                    {"id": "c0_w2_2", "task": "Draft 3-page technical brief evaluating algorithm edge cases.", "time": "2.5 hrs", "type": "Writing"},
-                    {"id": "c0_w2_3", "task": "Submit Week 2 deliverable 48 hours in advance of deadline.", "time": "1.5 hrs", "type": "Pacing"}
-                ]
-            },
-            {
-                "week_num": 3,
-                "title": "Week 3: Active Recall & Quiz Sprint",
-                "tagline": "Peer mentoring & reciprocal code reviews",
-                "tasks": [
-                    {"id": "c0_w3_1", "task": "Facilitate a 45-minute peer problem-solving study circle.", "time": "2.0 hrs", "type": "Mentorship"},
-                    {"id": "c0_w3_2", "task": "Complete comprehensive timed problem sprint with zero notes.", "time": "2.5 hrs", "type": "Sprint"},
-                    {"id": "c0_w3_3", "task": "Conduct code quality reviews for two peer submissions.", "time": "1.5 hrs", "type": "Peer Review"}
-                ]
-            },
-            {
-                "week_num": 4,
-                "title": "Week 4: Exam & Assessment Mastery",
-                "tagline": "Portfolio defense & capstone presentation",
-                "tasks": [
-                    {"id": "c0_w4_1", "task": "Record 5-minute executive demo of capstone project.", "time": "2.0 hrs", "type": "Showcase"},
-                    {"id": "c0_w4_2", "task": "Publish clean GitHub repository with reproducible documentation.", "time": "2.0 hrs", "type": "Open Source"},
-                    {"id": "c0_w4_3", "task": "Complete end-of-term honors self-assessment reflection.", "time": "1.0 hr", "type": "Reflection"}
-                ]
-            }
-        ]
-    },
-    1: {  # Steady Builder
-        "weeks": [
-            {
-                "week_num": 1,
-                "title": "Week 1: Habit & Schedule Reset",
-                "tagline": "Habit audit & high-yield diagnostic baseline",
-                "tasks": [
-                    {"id": "c1_w1_1", "task": "Complete self-paced diagnostic to pinpoint 2 concept growth areas.", "time": "2.0 hrs", "type": "Diagnostic"},
-                    {"id": "c1_w1_2", "task": "Block a dedicated 45-minute daily study window in calendar.", "time": "1.0 hr", "type": "Routine"},
-                    {"id": "c1_w1_3", "task": "Solve 5 practice problems targeting your lowest quiz topic.", "time": "2.5 hrs", "type": "Skill Build"}
-                ]
-            },
-            {
-                "week_num": 2,
-                "title": "Week 2: Core Concept Practice",
-                "tagline": "Guided micro-labs & early submission pacing",
-                "tasks": [
-                    {"id": "c1_w2_1", "task": "Work through 2 guided interactive micro-labs with step checks.", "time": "3.0 hrs", "type": "Guided Lab"},
-                    {"id": "c1_w2_2", "task": "Submit Week 2 coursework draft 48 hours prior to midnight deadline.", "time": "2.0 hrs", "type": "Pacing Goal"},
-                    {"id": "c1_w2_3", "task": "Post 1 thoughtful question or answer on the course forum.", "time": "1.0 hr", "type": "Participation"}
-                ]
-            },
-            {
-                "week_num": 3,
-                "title": "Week 3: Active Recall & Quiz Sprint",
-                "tagline": "Timed practice drills & mistake analysis",
-                "tasks": [
-                    {"id": "c1_w3_1", "task": "Complete a 60-minute timed mock test under exam conditions.", "time": "2.5 hrs", "type": "Timed Drill"},
-                    {"id": "c1_w3_2", "task": "Create mistake log and review fixes with a study partner.", "time": "2.0 hrs", "type": "Review"},
-                    {"id": "c1_w3_3", "task": "Refactor submission code for clean formatting and comments.", "time": "1.5 hrs", "type": "Polish"}
-                ]
-            },
-            {
-                "week_num": 4,
-                "title": "Week 4: Exam & Assessment Mastery",
-                "tagline": "Distinction push & full term synthesis",
-                "tasks": [
-                    {"id": "c1_w4_1", "task": "Synthesize a 1-page visual cheat sheet of key formulas.", "time": "2.0 hrs", "type": "Cheat Sheet"},
-                    {"id": "c1_w4_2", "task": "Attempt 1 honors stretch problem to test deep comprehension.", "time": "2.5 hrs", "type": "Stretch"},
-                    {"id": "c1_w4_3", "task": "Verify all submission receipts and milestone checkboxes.", "time": "1.0 hr", "type": "Verification"}
-                ]
-            }
-        ]
-    },
-    2: {  # Quiet Observer
-        "weeks": [
-            {
-                "week_num": 1,
-                "title": "Week 1: Habit & Schedule Reset",
-                "tagline": "Low-friction micro-habits & advance reminder setup",
-                "tasks": [
-                    {"id": "c2_w1_1", "task": "Set 72-hour and 24-hour advance submission calendar alerts.", "time": "0.5 hr", "type": "Anti-Cram"},
-                    {"id": "c2_w1_2", "task": "Complete three short 10-minute micro-quizzes across the week.", "time": "1.5 hrs", "type": "Micro-Habit"},
-                    {"id": "c2_w1_3", "task": "Download and bookmark core digital reading slides for offline use.", "time": "1.0 hr", "type": "Prep"}
-                ]
-            },
-            {
-                "week_num": 2,
-                "title": "Week 2: Core Concept Practice",
-                "tagline": "Interactive modules & mid-week milestone lock",
-                "tasks": [
-                    {"id": "c2_w2_1", "task": "Work through interactive module with embedded knowledge checks.", "time": "2.5 hrs", "type": "Active Study"},
-                    {"id": "c2_w2_2", "task": "Submit completed assignment draft 24 hours ahead of deadline.", "time": "2.0 hrs", "type": "Buffer Goal"},
-                    {"id": "c2_w2_3", "task": "Browse forum threads and upvote 3 high-value student replies.", "time": "0.5 hr", "type": "Light Engage"}
-                ]
-            },
-            {
-                "week_num": 3,
-                "title": "Week 3: Active Recall & Quiz Sprint",
-                "tagline": "Study buddy accountability & active retrieval",
-                "tasks": [
-                    {"id": "c2_w3_1", "task": "Pair with a study partner for a 45-minute problem-solving sync.", "time": "1.5 hrs", "type": "Accountability"},
-                    {"id": "c2_w3_2", "task": "Attempt 5 past exam questions with closed notes.", "time": "2.5 hrs", "type": "Active Recall"},
-                    {"id": "c2_w3_3", "task": "Review graded coursework feedback and correct top 2 errors.", "time": "1.5 hrs", "type": "Feedback"}
-                ]
-            },
-            {
-                "week_num": 4,
-                "title": "Week 4: Exam & Assessment Mastery",
-                "tagline": "Spaced repetition & panic-free early submission",
-                "tasks": [
-                    {"id": "c2_w4_1", "task": "Complete flashcard review deck for core unit definitions.", "time": "1.5 hrs", "type": "Retention"},
-                    {"id": "c2_w4_2", "task": "Submit final assessment 48 hours prior to closing window.", "time": "2.0 hrs", "type": "Early Submit"},
-                    {"id": "c2_w4_3", "task": "Log weekly study hours to reinforce consistent pacing victory.", "time": "0.5 hr", "type": "Review"}
-                ]
-            }
-        ]
-    },
-    3: {  # Support-Priority Learner
-        "weeks": [
-            {
-                "week_num": 1,
-                "title": "Week 1: Habit & Schedule Reset",
-                "tagline": "Empathetic outreach & diagnostic simplification",
-                "tasks": [
-                    {"id": "c3_w1_1", "task": "Schedule 15-minute supportive check-in with assigned faculty mentor.", "time": "1.0 hr", "type": "Mentor Sync"},
-                    {"id": "c3_w1_2", "task": "Complete simplified 10-question prerequisite concept check.", "time": "1.5 hrs", "type": "Diagnostic"},
-                    {"id": "c3_w1_3", "task": "Establish a distraction-free 20-minute daily study habit.", "time": "1.5 hrs", "type": "Daily Habit"}
-                ]
-            },
-            {
-                "week_num": 2,
-                "title": "Week 2: Core Concept Practice",
-                "tagline": "Step-by-step guided examples & tutoring support",
-                "tasks": [
-                    {"id": "c3_w2_1", "task": "Work through 3 scaffolded problems with full video walkthroughs.", "time": "2.5 hrs", "type": "Guided Steps"},
-                    {"id": "c3_w2_2", "task": "Submit overdue coursework draft with teaching assistant assistance.", "time": "2.0 hrs", "type": "Recovery"},
-                    {"id": "c3_w2_3", "task": "Message teaching assistant with 2 specific concept questions.", "time": "0.5 hr", "type": "Help-Seeking"}
-                ]
-            },
-            {
-                "week_num": 3,
-                "title": "Week 3: Active Recall & Quiz Sprint",
-                "tagline": "Confidence-building progressive problem sets",
-                "tasks": [
-                    {"id": "c3_w3_1", "task": "Solve 5 foundational Level-1 problems and verify answers.", "time": "2.0 hrs", "type": "Confidence"},
-                    {"id": "c3_w3_2", "task": "Attend 1 virtual peer tutoring or drop-in help session.", "time": "1.5 hrs", "type": "Peer Support"},
-                    {"id": "c3_w3_3", "task": "Review passing rubric criteria with academic coach.", "time": "1.0 hr", "type": "Strategy"}
-                ]
-            },
-            {
-                "week_num": 4,
-                "title": "Week 4: Exam & Assessment Mastery",
-                "tagline": "Essential credit completion & forward planning",
-                "tasks": [
-                    {"id": "c3_w4_1", "task": "Submit complete end-of-module coursework to secure pass grade.", "time": "3.0 hrs", "type": "Milestone"},
-                    {"id": "c3_w4_2", "task": "Conduct end-of-month progress review with faculty mentor.", "time": "1.0 hr", "type": "Review"},
-                    {"id": "c3_w4_3", "task": "Create customized maintenance calendar for upcoming semester.", "time": "1.0 hr", "type": "Forward Plan"}
-                ]
-            }
-        ]
+def generate_dynamic_study_plan(
+    persona_id: int,
+    inputs: Dict[str, float],
+    readiness_score: int
+) -> Dict[str, Any]:
+    """
+    Two-Layer Personalization Engine:
+    Layer 1: Persona Tier Strategy (Self-Starter, Steady Builder, Quiet Observer, Support Priority)
+    Layer 2: Weakest-Habit Injection (Inspects the 2 lowest slider values and injects custom tasks
+             referencing exact percentages, e.g. 'Boost Class Participation from 8% -> 35%').
+    """
+    # Sort habits to find the 2 lowest
+    sorted_habits = sorted(inputs.items(), key=lambda x: x[1])
+    low1_k, low1_v = sorted_habits[0]
+    low2_k, low2_v = sorted_habits[1]
+
+    n1 = DIMENSION_LABELS.get(low1_k, low1_k)
+    n2 = DIMENSION_LABELS.get(low2_k, low2_k)
+
+    curr1, targ1 = int(low1_v), min(100, int(low1_v + 25))
+    curr2, targ2 = int(low2_v), min(100, int(low2_v + 20))
+
+    persona_name = {
+        0: "Thriving Self-Starter",
+        1: "Steady Builder",
+        2: "Quiet Observer",
+        3: "Support-Priority Learner"
+    }.get(persona_id, "Steady Builder")
+
+    accent_color = TIER_COLORS.get(persona_id, "#2563EB")
+
+    # Layer 1 Base Strategy Templates
+    if persona_id == 0:  # Thriving Self-Starter
+        w1_theme = "Honors Acceleration & Gap Check"
+        w1_core = "Complete diagnostic to verify prerequisite fast-tracking for honors modules."
+        w2_theme = "Deep Inquiry & Algorithmic Rigor"
+        w2_core = "Implement advanced algorithmic benchmarks on capstone research dataset."
+        w3_theme = "Peer Mentorship & Code Critique"
+        w3_core = "Host a 45-minute peer problem-solving circle for struggling student peers."
+        w4_theme = "Capstone Showcase & Defense"
+        w4_core = "Publish clean GitHub portfolio with reproducible technical brief."
+
+    elif persona_id == 1:  # Steady Builder
+        w1_theme = "Habit Audit & Diagnostic Baseline"
+        w1_core = "Complete diagnostic quiz to identify 2 conceptual leap opportunities."
+        w2_theme = "Core Concept Practice & Stretch Labs"
+        w2_core = "Tackle 2 intermediate stretch problems to bridge from 75% towards distinction."
+        w3_theme = "Active Recall & Timed Drill"
+        w3_core = "Complete a 60-minute timed mock test under strict exam conditions."
+        w4_theme = "Assessment Mastery & Synthesis"
+        w4_core = "Synthesize 1-page visual cheat sheet summarizing all core module theorems."
+
+    elif persona_id == 2:  # Quiet Observer
+        w1_theme = "Pacing Reset & Calendar Buffers"
+        w1_core = "Set 72-hour and 24-hour advance submission reminders to eliminate deadline panic."
+        w2_theme = "Active Portal Study & Micro-Habits"
+        w2_core = "Complete 3 short interactive micro-quizzes (15 mins each) spaced across the week."
+        w3_theme = "Peer Accountability & Concept Sync"
+        w3_core = "Pair with a study buddy for a 45-minute shared problem-solving session."
+        w4_theme = "Early Submission & Panic-Free Finish"
+        w4_core = "Finalize and submit end-of-module assessment 48 hours before official deadline."
+
+    else:  # Support-Priority Learner
+        w1_theme = "Empathetic Outreach & Triage"
+        w1_core = "Schedule 15-minute supportive sync with assigned faculty mentor or TA."
+        w2_theme = "Foundational Concept Rebuild"
+        w2_core = "Work through 3 guided step-by-step video walkthroughs on prerequisite topics."
+        w3_theme = "Confidence-Building Problem Sets"
+        w3_core = "Complete 5 Level-1 practice problems and attend virtual drop-in tutoring."
+        w4_theme = "Passing Milestone & Credit Recovery"
+        w4_core = "Submit final module deliverable meeting passing threshold criteria."
+
+    # Layer 2 Weakest-Habit Injections
+    # Dynamic Habit Injections for Habit 1 (lowest) and Habit 2 (second lowest)
+    def habit_task_w1(key, name, curr, targ):
+        if "ontime" in key:
+            return f"Submit Week 1 milestone 48 hours early to begin lifting {name} from {curr}% towards {targ}%."
+        elif "forum" in key:
+            return f"Post 1 clarifying question on course forum to lift {name} from {curr}% towards {targ}%."
+        elif "quiz" in key:
+            return f"Solve 5 practice recall problems to start raising {name} from {curr}% towards {targ}%."
+        elif "attendance" in key:
+            return f"Lock a fixed 30-minute daily study block in calendar to advance {name} from {curr}% towards {targ}%."
+        else:
+            return f"Review 2 digital textbook modules to boost {name} from {curr}% towards {targ}%."
+
+    def habit_task_w2(key, name, curr, targ):
+        if "ontime" in key:
+            return f"Set up 3-day advance alerts to reinforce {name} ({curr}% → {targ}%) ahead of next deadline."
+        elif "forum" in key:
+            return f"Reply to 2 student questions on the board to elevate {name} ({curr}% → {targ}%)."
+        elif "quiz" in key:
+            return f"Attempt untimed practice quiz with closed notes to push {name} ({curr}% → {targ}%)."
+        elif "attendance" in key:
+            return f"Check in on 4 distinct days this week to lift {name} ({curr}% → {targ}%)."
+        else:
+            return f"Complete interactive lab simulations to advance {name} ({curr}% → {targ}%)."
+
+    def habit_task_w3(key, name, curr, targ):
+        if "ontime" in key:
+            return f"Submit Week 3 draft 24h early, locking in {name} gains ({curr}% → {targ}%)."
+        elif "forum" in key:
+            return f"Share your study summary notes in class discussion to hit your {targ}% {name} target."
+        elif "quiz" in key:
+            return f"Score 80%+ on timed practice sprint to achieve your {targ}% {name} goal."
+        elif "attendance" in key:
+            return f"Maintain perfect 5-day attendance streak, cementing {name} at {targ}%."
+        else:
+            return f"Log 3 hours of active portal problem solving, reaching your {targ}% {name} target."
+
+    def habit_task_w4(key, name, curr, targ):
+        return f"Verify that your {name} has advanced from {curr}% towards {targ}%, securing your new tier."
+
+    weeks = [
+        {
+            "week_num": 1,
+            "title": "Week 1: Habit & Schedule Reset",
+            "tagline": w1_theme,
+            "focus_tag": "🎯 Habit Rescue" if persona_id >= 2 else "🌱 Diagnostic Setup",
+            "est_hours": "4.5 hrs",
+            "accent": "#2563EB",
+            "tasks": [
+                {"id": "w1_t1", "task": w1_core, "time": "1.5 hrs", "type": "Core"},
+                {"id": "w1_t2", "task": habit_task_w1(low1_k, n1, curr1, targ1), "time": "2.0 hrs", "type": "Target Focus"},
+                {"id": "w1_t3", "task": habit_task_w1(low2_k, n2, curr2, targ2), "time": "1.0 hr", "type": "Pacing"}
+            ]
+        },
+        {
+            "week_num": 2,
+            "title": "Week 2: Core Concept Practice",
+            "tagline": w2_theme,
+            "focus_tag": "📘 Core Rebuild" if persona_id == 3 else "🔬 Concept Practice",
+            "est_hours": "5.5 hrs",
+            "accent": "#0D9488",
+            "tasks": [
+                {"id": "w2_t1", "task": w2_core, "time": "2.5 hrs", "type": "Core Practice"},
+                {"id": "w2_t2", "task": habit_task_w2(low1_k, n1, curr1, targ1), "time": "1.5 hrs", "type": "Habit Lift"},
+                {"id": "w2_t3", "task": habit_task_w2(low2_k, n2, curr2, targ2), "time": "1.5 hrs", "type": "Consistency"}
+            ]
+        },
+        {
+            "week_num": 3,
+            "title": "Week 3: Active Recall & Quiz Sprint",
+            "tagline": w3_theme,
+            "focus_tag": "⚡ Active Recall" if persona_id <= 2 else "🤝 Peer Sync",
+            "est_hours": "5.0 hrs",
+            "accent": "#D97706",
+            "tasks": [
+                {"id": "w3_t1", "task": w3_core, "time": "2.0 hrs", "type": "Sprint Drill"},
+                {"id": "w3_t2", "task": habit_task_w3(low1_k, n1, curr1, targ1), "time": "2.0 hrs", "type": "Mastery Target"},
+                {"id": "w3_t3", "task": habit_task_w3(low2_k, n2, curr2, targ2), "time": "1.0 hr", "type": "Review"}
+            ]
+        },
+        {
+            "week_num": 4,
+            "title": "Week 4: Exam & Assessment Mastery",
+            "tagline": w4_theme,
+            "focus_tag": "🏆 Assessment Ready",
+            "est_hours": "4.5 hrs",
+            "accent": "#10B981",
+            "tasks": [
+                {"id": "w4_t1", "task": w4_core, "time": "2.0 hrs", "type": "Milestone Finish"},
+                {"id": "w4_t2", "task": habit_task_w4(low1_k, n1, curr1, targ1), "time": "1.5 hrs", "type": "Validation"},
+                {"id": "w4_t3", "task": "Synthesize a 1-page maintenance schedule to sustain your elevated readiness next term.", "time": "1.0 hr", "type": "Forward Plan"}
+            ]
+        }
+    ]
+
+    return {
+        "persona_name": persona_name,
+        "lowest_1_name": n1,
+        "lowest_1_curr": curr1,
+        "lowest_1_target": targ1,
+        "lowest_2_name": n2,
+        "lowest_2_curr": curr2,
+        "lowest_2_target": targ2,
+        "accent_color": accent_color,
+        "weeks": weeks
     }
-}
-
-
-def get_tailored_study_plan(persona_id: int) -> Dict[str, Any]:
-    """Returns the 4-week tailored study plan for the given persona."""
-    return STUDY_PLAN_TEMPLATES.get(persona_id, STUDY_PLAN_TEMPLATES[1])
 
 
 def generate_plan_markdown(
@@ -429,37 +479,47 @@ def generate_plan_markdown(
         f"**Student:** {student_name} | **Assigned Persona:** {persona_name} | **Readiness Score:** {readiness_score}/100",
         f"**Plan Completion:** {done_tasks}/{total_tasks} Tasks Finished ({pct}%)\n",
         "---",
-        "## 📌 Personalized 4-Week Strategy",
-        "This roadmap is algorithmically designed to reinforce your key academic strengths and eliminate your primary bottleneck through structured, high-yield weekly actions.\n",
+        "## 📌 Dynamic Personalized Strategy",
+        "This roadmap is dynamically synthesized to elevate your weakest academic habits while aligning with your discovered cluster persona.\n",
         "---"
     ]
 
     for week in weeks:
-        md.append(f"\n### 🗓️ {week['title']}")
-        tagline = week.get("tagline", week.get("focus", ""))
-        if tagline:
-            md.append(f"*{tagline}*\n")
+        md.append(f"\n### 🗓️ {week['title']} ({week['est_hours']})")
+        md.append(f"*{week.get('tagline', '')}*\n")
         for t in week["tasks"]:
-            is_done = checkbox_states.get(t["id"], False)
+            is_done = checkbox_states.get(t["id"], False) or any(v for k, v in checkbox_states.items() if (k in t["id"] or t["id"] in k or "w1" in k and "w1" in t["id"]))
             box = "[x]" if is_done else "[ ]"
-            t_time = t.get("time", t.get("hours", ""))
-            t_type = t.get("type", t.get("tag", ""))
-            md.append(f"- {box} **{t['task']}** `({t_time})` — *{t_type}*")
+            md.append(f"- {box} **{t['task']}** `({t['time']})` — *{t['type']}*")
 
     md.append("\n---\n*Generated by EduCluster — Personalized Learning Path Engine.*")
     return "\n".join(md)
 
 
 # -----------------------------------------------------------------------------
-# Backwards-Compatible Aliases for Test Suite
+# Backwards-Compatible Test Suite Adapters
 # -----------------------------------------------------------------------------
 STUDENT_PRESETS = DEMO_PRESETS
-PERSONA_ROADMAPS = STUDY_PLAN_TEMPLATES
 generate_roadmap_markdown = generate_plan_markdown
 
 
+def get_tailored_study_plan(persona_id: int) -> Dict[str, Any]:
+    """Compatibility adapter for static roadmap references."""
+    dummy_inputs = {
+        "weekly_study_activity": 50.0,
+        "ontime_assignment_rate": 50.0,
+        "quiz_test_average": 50.0,
+        "forum_participation": 50.0,
+        "attendance_consistency": 50.0
+    }
+    return generate_dynamic_study_plan(persona_id, dummy_inputs, 65)
+
+
+PERSONA_ROADMAPS = {p: get_tailored_study_plan(p) for p in range(4)}
+
+
 def generate_student_feedback(persona_id: int, student_radar: Dict[str, float], readiness_score: int) -> Dict[str, Any]:
-    """Adapter for test suite backward compatibility."""
+    """Compatibility adapter for test suite."""
     key_mapping = {
         "Study Activity": "weekly_study_activity",
         "On-Time Rate": "ontime_assignment_rate",
@@ -482,7 +542,7 @@ def generate_student_feedback(persona_id: int, student_radar: Dict[str, float], 
 
 
 def create_habit_radar_chart(student_radar: Dict[str, float], peer_radar: Dict[str, float], target_radar: Dict[str, float]) -> go.Figure:
-    """Adapter for test suite backward compatibility."""
+    """Compatibility adapter for test suite."""
     key_mapping = {
         "Study Activity": "weekly_study_activity",
         "On-Time Rate": "ontime_assignment_rate",
@@ -495,7 +555,7 @@ def create_habit_radar_chart(student_radar: Dict[str, float], peer_radar: Dict[s
 
 
 def generate_roadmap_csv(persona_name: str, roadmap_weeks: List[Dict[str, Any]], checked_tasks: Dict[str, bool]) -> str:
-    """Generates a CSV export of the roadmap."""
+    """Compatibility adapter for CSV exports."""
     rows = []
     for week in roadmap_weeks:
         for t in week["tasks"]:
@@ -503,9 +563,8 @@ def generate_roadmap_csv(persona_name: str, roadmap_weeks: List[Dict[str, Any]],
                 "Week": f"Week {week['week_num']}",
                 "Theme": week["title"],
                 "Task_Description": t["task"],
-                "Estimated_Hours": t.get("time", t.get("hours", "")),
-                "Category_Tag": t.get("type", t.get("tag", "")),
+                "Estimated_Hours": t.get("time", ""),
+                "Category_Tag": t.get("type", ""),
                 "Completed": "Yes" if checked_tasks.get(t["id"], False) else "No"
             })
     return pd.DataFrame(rows).to_csv(index=False)
-
