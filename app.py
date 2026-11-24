@@ -36,7 +36,6 @@ from recommender import (
     DEMO_PRESETS,
     DIMENSION_LABELS,
     diagnose_student_profile,
-    create_readiness_gauge,
     create_comparison_chart,
     generate_dynamic_study_plan,
     generate_plan_markdown
@@ -48,6 +47,55 @@ except ImportError:
         0: "#059669", 1: "#2563EB", 2: "#D97706", 3: "#DC2626",
         "thriving": "#059669", "steady": "#2563EB", "quiet": "#D97706", "support": "#DC2626"
     }
+
+
+def create_readiness_gauge(readiness_score: int, persona_id: int) -> go.Figure:
+    """
+    Renders a circular Plotly Indicator gauge color-coded dynamically by learner tier.
+    Ensures gauge={'axis': {'range': [0, 100]}} aligns cleanly with the outer arc.
+    """
+    color = TIER_COLORS.get(persona_id, "#2563EB")
+    fig = go.Figure(go.Indicator(
+        mode="gauge+number",
+        value=readiness_score,
+        domain={"x": [0, 1], "y": [0, 1]},
+        number={
+            "suffix": "%",
+            "font": {"size": 32, "color": "#0F172A", "family": "Inter, sans-serif"}
+        },
+        gauge={
+            "shape": "angular",
+            "axis": {
+                "range": [0, 100],
+                "tickwidth": 1,
+                "tickcolor": "#CBD5E1",
+                "tickvals": [0, 25, 50, 75, 100],
+                "tickfont": {"size": 9, "color": "#64748B"}
+            },
+            "bar": {"color": color, "thickness": 0.28},
+            "bgcolor": "#F8FAFC",
+            "borderwidth": 1,
+            "bordercolor": "#E2E8F0",
+            "steps": [
+                {"range": [0, 35], "color": "#FEE2E2"},
+                {"range": [35, 60], "color": "#FEF3C7"},
+                {"range": [60, 80], "color": "#E0F2FE"},
+                {"range": [80, 100], "color": "#D1FAE5"}
+            ],
+            "threshold": {
+                "line": {"color": color, "width": 4},
+                "thickness": 0.8,
+                "value": readiness_score
+            }
+        }
+    ))
+    fig.update_layout(
+        paper_bgcolor="#FFFFFF",
+        plot_bgcolor="#FFFFFF",
+        height=190,
+        margin=dict(l=15, r=15, t=10, b=10)
+    )
+    return fig
 
 # -----------------------------------------------------------------------------
 # 1. Page Configuration & Executive Light SaaS Theme
@@ -204,7 +252,7 @@ st.markdown("""
                 </span>
             </div>
             <p style="color: rgba(255, 255, 255, 0.90); font-size: 0.95rem; margin: 6px 0 0 0; font-weight: 400;">
-                Personalized Learning Path Engine for Academic Success & Proactive Intervention • SIH26036
+                Personalized Learning Path Engine for Academic Success & Proactive Intervention
             </p>
         </div>
         <div style="display: flex; align-items: center; gap: 8px;">
@@ -659,10 +707,18 @@ with tab3:
         paper_bgcolor="#FFFFFF",
         plot_bgcolor="#F8FAFC",
         height=380,
-        margin=dict(l=20, r=20, t=10, b=10),
+        margin=dict(l=20, r=20, t=35, b=10),
         xaxis=dict(gridcolor="#E2E8F0", zerolinecolor="#CBD5E1"),
         yaxis=dict(gridcolor="#E2E8F0", zerolinecolor="#CBD5E1"),
-        legend=dict(orientation="h", yanchor="bottom", y=-0.22, xanchor="center", x=0.5, font=dict(color="#334155"))
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.10,
+            xanchor="center",
+            x=0.5,
+            font=dict(color="#334155")
+        ),
+        legend_title_text=""
     )
 
     with st.container(border=True):
@@ -731,4 +787,4 @@ foot_col1, foot_col2 = st.columns([2, 1])
 with foot_col1:
     st.markdown("<span style='font-size: 0.85rem; color: #64748B;'>EduCluster — Personalized Learning Path Engine</span>", unsafe_allow_html=True)
 with foot_col2:
-    st.markdown("<div style='text-align: right;'><span style='font-size: 0.82rem; color: #94A3B8;'>Production SaaS Ready • SIH26036</span></div>", unsafe_allow_html=True)
+    st.markdown("<div style='text-align: right;'><span style='font-size: 0.82rem; color: #94A3B8;'>Production SaaS Ready</span></div>", unsafe_allow_html=True)

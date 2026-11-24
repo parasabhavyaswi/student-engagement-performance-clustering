@@ -171,6 +171,7 @@ def create_readiness_gauge(readiness_score: int, persona_id: int) -> go.Figure:
             "font": {"size": 32, "color": "#0F172A", "family": "Inter, sans-serif"}
         },
         gauge={
+            "shape": "angular",
             "axis": {
                 "range": [0, 100],
                 "tickwidth": 1,
