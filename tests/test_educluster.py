@@ -196,6 +196,7 @@ def test_clean_repository_structure():
     assert not (PROJECT_ROOT / "EduCluster_ML_Presentation.pptx").exists(), "EduCluster_ML_Presentation.pptx should be removed!"
     assert not (PROJECT_ROOT / "IEEE_Conference_Template__2_.docx").exists(), "IEEE_Conference_Template__2_.docx should be removed!"
     assert not (PROJECT_ROOT / "templates").exists(), "templates folder should be removed!"
+    assert not (PROJECT_ROOT / "Dockerfile").exists(), "Dockerfile should be removed!"
 
 
 def test_ml_engine_pipeline_and_personas():

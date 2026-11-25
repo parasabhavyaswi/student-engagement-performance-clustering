@@ -114,9 +114,6 @@ student-engagement-performance-clustering/
 ├── app.py                        # Target-user-first Streamlit web application (Student & Faculty views)
 ├── ml_engine.py                  # Core ML pipeline (16 features, 14,003 records, k=4, 2D PCA, validation)
 ├── recommender.py                # Student-first recommender, habit radar, what-if simulator, & roadmaps
-├── Dockerfile                    # Container definition for Docker & Cloud Run
-├── Procfile                      # Process file for Heroku / Render deployment
-├── render.yaml                   # Render Cloud deployment blueprint
 ├── requirements.txt              # Production dependency specifications
 └── README.md
 ```
@@ -144,15 +141,6 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 Access the application locally at: **`http://localhost:8501`**
-
-### 3. Run with Docker
-```bash
-# Build the Docker container
-docker build -t educluster-ml .
-
-# Run the container
-docker run -p 8501:8501 educluster-ml
-```
 
 ---
 
