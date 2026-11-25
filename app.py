@@ -219,11 +219,8 @@ def init_session_state():
         st.session_state.active_preset = "topper"
 
     preset_defaults = DEMO_PRESETS["topper"]
-    for key in [
-        "total_clicks", "on_time_rate", "avg_score", "forum_clicks", "active_days",
-        "weekly_study_activity", "ontime_assignment_rate", "quiz_test_average", "forum_participation", "attendance_consistency"
-    ]:
-        if key not in st.session_state and key in preset_defaults:
+    for key in ["weekly_study_activity", "ontime_assignment_rate", "quiz_test_average", "forum_participation", "attendance_consistency"]:
+        if key not in st.session_state:
             st.session_state[key] = preset_defaults[key]
 
     if "task_checks" not in st.session_state:
@@ -307,17 +304,11 @@ with tab1:
 
             def set_preset(name: str):
                 p = DEMO_PRESETS[name]
-                st.session_state.total_clicks = p["total_clicks"]
-                st.session_state.on_time_rate = p["on_time_rate"]
-                st.session_state.avg_score = p["avg_score"]
-                st.session_state.forum_clicks = p["forum_clicks"]
-                st.session_state.active_days = p["active_days"]
-                # Keep legacy keys synchronized
-                st.session_state.weekly_study_activity = p["total_clicks"]
-                st.session_state.ontime_assignment_rate = p["on_time_rate"]
-                st.session_state.quiz_test_average = p["avg_score"]
-                st.session_state.forum_participation = p["forum_clicks"]
-                st.session_state.attendance_consistency = p["active_days"]
+                st.session_state.weekly_study_activity = p["weekly_study_activity"]
+                st.session_state.ontime_assignment_rate = p["ontime_assignment_rate"]
+                st.session_state.quiz_test_average = p["quiz_test_average"]
+                st.session_state.forum_participation = p["forum_participation"]
+                st.session_state.attendance_consistency = p["attendance_consistency"]
                 st.session_state.active_preset = name
 
             with p_col1:
@@ -337,55 +328,55 @@ with tab1:
 
             # 5 Plain-English Sliders (0-100% scale)
             s_act = st.slider(
-                "1. Total VLE Clicks",
+                "1. Total VLE Clicks (total_clicks)",
                 min_value=0, max_value=100,
-                value=int(st.session_state.get("total_clicks", st.session_state.get("weekly_study_activity", 85))),
+                value=int(st.session_state.weekly_study_activity),
                 format="%d%%",
-                help="Total volume of VLE platform clicks, reading modules, and interactive materials accessed.",
-                key="total_clicks"
+                help="total_clicks: Total VLE clicks dedicated to reading materials and learning modules.",
+                key="weekly_study_activity"
             )
             s_ontime = st.slider(
-                "2. On-Time Submissions (%)",
+                "2. On-Time Submissions (%) (on_time_rate)",
                 min_value=0, max_value=100,
-                value=int(st.session_state.get("on_time_rate", st.session_state.get("ontime_assignment_rate", 95))),
+                value=int(st.session_state.ontime_assignment_rate),
                 format="%d%%",
-                help="Percentage of assignments and problem sets submitted before or on the deadline.",
-                key="on_time_rate"
+                help="on_time_rate: Percentage of coursework assignments submitted before or on the deadline.",
+                key="ontime_assignment_rate"
             )
             s_quiz = st.slider(
-                "3. Assessment Score (%)",
+                "3. Assessment Score (%) (avg_score)",
                 min_value=0, max_value=100,
-                value=int(st.session_state.get("avg_score", st.session_state.get("quiz_test_average", 88))),
+                value=int(st.session_state.quiz_test_average),
                 format="%d%%",
-                help="Your average score across graded quizzes and formal assessments.",
-                key="avg_score"
+                help="avg_score: Average percentage score across weighted quizzes, exams, and assessments.",
+                key="quiz_test_average"
             )
             s_forum = st.slider(
-                "4. Forum Activity (%)",
+                "4. Forum Activity (%) (forum_clicks)",
                 min_value=0, max_value=100,
-                value=int(st.session_state.get("forum_clicks", st.session_state.get("forum_participation", 72))),
+                value=int(st.session_state.forum_participation),
                 format="%d%%",
-                help="Relative activity and participation on discussion boards and forums.",
-                key="forum_clicks"
+                help="forum_clicks: Active engagement on discussion boards, forum threads, and Q&A.",
+                key="forum_participation"
             )
             s_att = st.slider(
-                "5. Active Study Days (%)",
+                "5. Active Study Days (%) (active_days)",
                 min_value=0, max_value=100,
-                value=int(st.session_state.get("active_days", st.session_state.get("attendance_consistency", 92))),
+                value=int(st.session_state.attendance_consistency),
                 format="%d%%",
-                help="Percentage of active study days logged into the platform across the course.",
-                key="active_days"
+                help="active_days: Regularity of active portal study days across the academic term.",
+                key="attendance_consistency"
             )
 
     # -------------------------------------------------------------------------
     # Real-Time Diagnosis Computation
     # -------------------------------------------------------------------------
     active_inputs = {
-        "total_clicks": float(s_act),
-        "on_time_rate": float(s_ontime),
-        "avg_score": float(s_quiz),
-        "forum_clicks": float(s_forum),
-        "active_days": float(s_att)
+        "weekly_study_activity": float(s_act),
+        "ontime_assignment_rate": float(s_ontime),
+        "quiz_test_average": float(s_quiz),
+        "forum_participation": float(s_forum),
+        "attendance_consistency": float(s_att)
     }
 
     pred_result = pipeline.predict_student_profile(**active_inputs)
@@ -489,10 +480,7 @@ with tab2:
     )
 
     # Input signature to namespace checkbox keys per student profile change
-    c_act = current_inp.get("total_clicks", current_inp.get("weekly_study_activity", 85))
-    c_ontime = current_inp.get("on_time_rate", current_inp.get("ontime_assignment_rate", 95))
-    c_score = current_inp.get("avg_score", current_inp.get("quiz_test_average", 88))
-    sig = f"{current_pid}_{int(c_act)}_{int(c_ontime)}_{int(c_score)}"
+    sig = f"{current_pid}_{int(current_inp['weekly_study_activity'])}_{int(current_inp['ontime_assignment_rate'])}_{int(current_inp['quiz_test_average'])}"
 
     # Calculate completion percentage
     total_tasks = sum(len(w["tasks"]) for w in dynamic_plan["weeks"])

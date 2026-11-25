@@ -339,76 +339,79 @@ class EduClusterPipeline:
 
     def predict_student_profile(
         self,
-        weekly_study_activity: Optional[float] = None,
-        ontime_assignment_rate: Optional[float] = None,
-        quiz_test_average: Optional[float] = None,
-        forum_participation: Optional[float] = None,
-        attendance_consistency: Optional[float] = None,
-        *,
-        total_clicks: Optional[float] = None,
-        on_time_rate: Optional[float] = None,
-        avg_score: Optional[float] = None,
-        forum_clicks: Optional[float] = None,
-        active_days: Optional[float] = None,
+        weekly_study_activity: float = 50.0,      # 0 to 100 (relative click/engagement scale)
+        ontime_assignment_rate: float = 75.0,     # 0% to 100%
+        quiz_test_average: float = 70.0,          # 0% to 100%
+        forum_participation: float = 40.0,        # 0 to 100
+        attendance_consistency: float = 65.0,     # 0% to 100%
         **kwargs
     ) -> Dict[str, Any]:
         """
         Maps 5 plain-English student dials into the 16-feature space,
         predicts learner persona, distance to centroids, PCA coordinates, and readiness score.
-        Supports both canonical feature names (total_clicks, on_time_rate, avg_score, forum_clicks, active_days)
-        and legacy dial parameter names.
+        Supports both canonical dial names and feature aliases:
+        - total_clicks / weekly_study_activity
+        - on_time_rate / ontime_assignment_rate
+        - avg_score / quiz_test_average
+        - forum_clicks / forum_participation
+        - active_days / attendance_consistency
         """
         if not self.is_fitted:
             raise RuntimeError("Pipeline must be fitted before prediction.")
 
-        # Resolve inputs with fallback support
-        act_val = float(total_clicks if total_clicks is not None else (weekly_study_activity if weekly_study_activity is not None else kwargs.get("total_clicks", kwargs.get("weekly_study_activity", 50.0))))
-        ontime_val = float(on_time_rate if on_time_rate is not None else (ontime_assignment_rate if ontime_assignment_rate is not None else kwargs.get("on_time_rate", kwargs.get("ontime_assignment_rate", 50.0))))
-        quiz_val = float(avg_score if avg_score is not None else (quiz_test_average if quiz_test_average is not None else kwargs.get("avg_score", kwargs.get("quiz_test_average", 50.0))))
-        forum_val = float(forum_clicks if forum_clicks is not None else (forum_participation if forum_participation is not None else kwargs.get("forum_clicks", kwargs.get("forum_participation", 50.0))))
-        att_val = float(active_days if active_days is not None else (attendance_consistency if attendance_consistency is not None else kwargs.get("active_days", kwargs.get("attendance_consistency", 50.0))))
+        if "total_clicks" in kwargs:
+            weekly_study_activity = kwargs["total_clicks"]
+        if "on_time_rate" in kwargs:
+            ontime_assignment_rate = kwargs["on_time_rate"]
+        if "avg_score" in kwargs:
+            quiz_test_average = kwargs["avg_score"]
+        if "forum_clicks" in kwargs:
+            forum_participation = kwargs["forum_clicks"]
+        if "active_days" in kwargs:
+            attendance_consistency = kwargs["active_days"]
 
         # Map 5 user dials to 16 OULAD features realistically
         # 1. Platform Engagement
-        mapped_clicks = np.exp(np.interp(act_val, [0, 100], [np.log(40), np.log(3500)]))
-        mapped_days = np.interp(att_val, [0, 100], [5, 110])
-        mapped_clicks_per_day = mapped_clicks / max(mapped_days, 1)
-        mapped_forum = np.exp(np.interp(forum_val, [0, 100], [0, np.log(450)]))
-        mapped_quiz_clicks = np.exp(np.interp(quiz_val, [0, 100], [np.log(10), np.log(500)]))
-        mapped_resource_clicks = mapped_clicks * 0.45
-        mapped_oucontent_clicks = mapped_clicks * 0.28
-        mapped_early_ratio = np.interp(act_val, [0, 100], [0.05, 0.40])
+        total_clicks = np.exp(np.interp(weekly_study_activity, [0, 100], [np.log(40), np.log(3500)]))
+        active_days = np.interp(attendance_consistency, [0, 100], [5, 110])
+        clicks_per_active_day = total_clicks / max(active_days, 1)
+        forum_clicks = np.exp(np.interp(forum_participation, [0, 100], [0, np.log(450)]))
+        quiz_clicks = np.exp(np.interp(quiz_test_average, [0, 100], [np.log(10), np.log(500)]))
+        resource_clicks = total_clicks * 0.45
+        oucontent_clicks = total_clicks * 0.28
+        early_engagement_ratio = np.interp(weekly_study_activity, [0, 100], [0.05, 0.40])
 
         # 2. Attendance & Consistency
-        mapped_span_days = np.interp(att_val, [0, 100], [45, 255])
-        mapped_regularity_std = np.interp(att_val, [0, 100], [60, 10])  # lower std = higher regularity
-        mapped_pre_course = np.exp(np.interp(act_val, [0, 100], [0, np.log(200)]))
-        mapped_active_ratio = np.interp(att_val, [0, 100], [0.15, 0.98])
+        engagement_span_days = np.interp(attendance_consistency, [0, 100], [45, 255])
+        activity_regularity_std = np.interp(attendance_consistency, [0, 100], [60, 10])  # lower std = higher regularity
+        pre_course_clicks = np.exp(np.interp(weekly_study_activity, [0, 100], [0, np.log(200)]))
+        weeks_active_ratio = np.interp(attendance_consistency, [0, 100], [0.15, 0.98])
 
         # 3. Assessment Performance
-        mapped_avg_score = np.clip(quiz_val, 0, 100)
-        mapped_comp_rate = np.clip(ontime_val / 100.0, 0.0, 1.0)
-        mapped_submission_delay = np.interp(ontime_val, [0, 100], [12.0, -5.0])
-        mapped_first_score = np.clip(quiz_val * 0.95 + 2.5, 0, 100)
+        weighted_avg_score = np.clip(quiz_test_average, 0, 100)
+        assessment_completion_rate = np.clip(ontime_assignment_rate / 100.0, 0.0, 1.0)
+        # On-time rate 100% -> -5 days (early); On-time rate 0% -> +12 days (late)
+        avg_submission_delay = np.interp(ontime_assignment_rate, [0, 100], [12.0, -5.0])
+        first_assessment_score = np.clip(quiz_test_average * 0.95 + 2.5, 0, 100)
 
         # Assemble into vector
         feature_dict = {
-            "total_clicks": mapped_clicks,
-            "active_days": mapped_days,
-            "clicks_per_active_day": mapped_clicks_per_day,
-            "forum_clicks": mapped_forum,
-            "quiz_clicks": mapped_quiz_clicks,
-            "resource_clicks": mapped_resource_clicks,
-            "oucontent_clicks": mapped_oucontent_clicks,
-            "early_engagement_ratio": mapped_early_ratio,
-            "engagement_span_days": mapped_span_days,
-            "activity_regularity_std": mapped_regularity_std,
-            "pre_course_clicks": mapped_pre_course,
-            "weeks_active_ratio": mapped_active_ratio,
-            "weighted_avg_score": mapped_avg_score,
-            "assessment_completion_rate": mapped_comp_rate,
-            "avg_submission_delay": mapped_submission_delay,
-            "first_assessment_score": mapped_first_score
+            "total_clicks": total_clicks,
+            "active_days": active_days,
+            "clicks_per_active_day": clicks_per_active_day,
+            "forum_clicks": forum_clicks,
+            "quiz_clicks": quiz_clicks,
+            "resource_clicks": resource_clicks,
+            "oucontent_clicks": oucontent_clicks,
+            "early_engagement_ratio": early_engagement_ratio,
+            "engagement_span_days": engagement_span_days,
+            "activity_regularity_std": activity_regularity_std,
+            "pre_course_clicks": pre_course_clicks,
+            "weeks_active_ratio": weeks_active_ratio,
+            "weighted_avg_score": weighted_avg_score,
+            "assessment_completion_rate": assessment_completion_rate,
+            "avg_submission_delay": avg_submission_delay,
+            "first_assessment_score": first_assessment_score
         }
 
         # Apply log1p on corresponding columns
@@ -429,22 +432,22 @@ class EduClusterPipeline:
         # Calculate student readiness score (0-100 composite index)
         # Weights: 35% Assessment, 25% On-Time, 20% Attendance, 12% Study Activity, 8% Forum
         readiness_score = int(round(
-            0.35 * quiz_val +
-            0.25 * ontime_val +
-            0.20 * att_val +
-            0.12 * act_val +
-            0.08 * forum_val
+            0.35 * quiz_test_average +
+            0.25 * ontime_assignment_rate +
+            0.20 * attendance_consistency +
+            0.12 * weekly_study_activity +
+            0.08 * forum_participation
         ))
         readiness_score = max(5, min(99, readiness_score))
 
         # Centroid radar scores for matched persona (0 to 100 standardized display values)
         # Normalize radar dimensions
         student_radar = {
-            "Study Activity": round(act_val, 1),
-            "On-Time Rate": round(ontime_val, 1),
-            "Quiz & Test Score": round(quiz_val, 1),
-            "Class Participation": round(forum_val, 1),
-            "Attendance Regularity": round(att_val, 1)
+            "Study Activity": round(weekly_study_activity, 1),
+            "On-Time Rate": round(ontime_assignment_rate, 1),
+            "Quiz & Test Score": round(quiz_test_average, 1),
+            "Class Participation": round(forum_participation, 1),
+            "Attendance Regularity": round(attendance_consistency, 1)
         }
 
         # Peer average radar scores for this persona
@@ -485,30 +488,9 @@ class EduClusterPipeline:
     ) -> Dict[str, Any]:
         """
         Simulates what happens if the student improves a specific habit by boost_percent.
-        Supports both canonical (total_clicks, on_time_rate, etc.) and legacy dimension names.
         Returns the new projected persona, new readiness score, and readiness delta.
         """
-        dim_map = {
-            "total_clicks": ["total_clicks", "weekly_study_activity"],
-            "weekly_study_activity": ["total_clicks", "weekly_study_activity"],
-            "on_time_rate": ["on_time_rate", "ontime_assignment_rate"],
-            "ontime_assignment_rate": ["on_time_rate", "ontime_assignment_rate"],
-            "avg_score": ["avg_score", "quiz_test_average"],
-            "quiz_test_average": ["avg_score", "quiz_test_average"],
-            "forum_clicks": ["forum_clicks", "forum_participation"],
-            "forum_participation": ["forum_clicks", "forum_participation"],
-            "active_days": ["active_days", "attendance_consistency"],
-            "attendance_consistency": ["active_days", "attendance_consistency"]
-        }
         modified = base_inputs.copy()
-        target_keys = dim_map.get(boost_dimension, [boost_dimension])
-        boosted_any = False
-        for k in target_keys:
-            if k in modified:
-                modified[k] = min(100.0, modified[k] + boost_percent)
-                boosted_any = True
-        if not boosted_any and target_keys:
-            modified[target_keys[0]] = min(100.0, 50.0 + boost_percent)
         current_val = modified[boost_dimension]
         modified[boost_dimension] = min(100.0, current_val + boost_percent)
 
