@@ -1,7 +1,8 @@
 # EduCluster ML: K-Means Clustering of Student Engagement and Performance Data for Personalized Learning Path Design
 
-[![Live Web App](https://img.shields.io/badge/Live%20Deployment-Online%20(Worldwide)-success?logo=cloudflare)](https://loan-popularity-guards-forms.trycloudflare.com)
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://student-engagement-performance-clustering.streamlit.app)
+[![Live Web App](https://img.shields.io/badge/Live%20Deployment-Online%20(Worldwide)-success?logo=cloudflare)](https://surely-seen-succeed-hypothetical.trycloudflare.com)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/deploy?repository=parasabhavyaswi/student-engagement-performance-clustering&branch=main&mainModule=app.py)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/parasabhavyaswi/student-engagement-performance-clustering)
 [![GitHub Repository](https://img.shields.io/badge/GitHub-student--engagement--performance--clustering-181717?logo=github)](https://github.com/parasabhavyaswi/student-engagement-performance-clustering)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
@@ -16,8 +17,9 @@
 
 | Service | Access Link | Description |
 | :--- | :--- | :--- |
-| **Instant Live Web App (Active Deployment)** | **[loan-popularity-guards-forms.trycloudflare.com](https://loan-popularity-guards-forms.trycloudflare.com)** | **Live Now (Worldwide)** — High-performance interactive telemetry dashboard |
-| **Streamlit Community Cloud** | **[student-engagement-performance-clustering.streamlit.app](https://student-engagement-performance-clustering.streamlit.app)** | Permanent Streamlit Cloud deployment target |
+| **Instant Live Web App (Worldwide Active)** | **[surely-seen-succeed-hypothetical.trycloudflare.com](https://surely-seen-succeed-hypothetical.trycloudflare.com)** | **Live Now** — High-performance interactive telemetry dashboard |
+| **Streamlit Community Cloud (1-Click Deploy)** | **[Deploy on Streamlit Cloud](https://share.streamlit.io/deploy?repository=parasabhavyaswi/student-engagement-performance-clustering&branch=main&mainModule=app.py)** | Permanent free cloud hosting via Streamlit Cloud |
+| **Render Web Service (1-Click Deploy)** | **[Deploy on Render](https://render.com/deploy?repo=https://github.com/parasabhavyaswi/student-engagement-performance-clustering)** | Permanent cloud deployment via included `render.yaml` |
 | **GitHub Repository** | **[parasabhavyaswi/student-engagement-performance-clustering](https://github.com/parasabhavyaswi/student-engagement-performance-clustering)** | Source code, models, datasets, tests, and deliverables |
 | **Local Deployment** | `http://localhost:8501` | Run locally via `streamlit run app.py` |
 | **Project Research Report (DOCX)** | **[REPORT (2).docx](REPORT%20(2).docx)** | Official project research paper manuscript (Word DOCX) |
@@ -124,6 +126,8 @@ student-engagement-performance-clustering/
 ├── app.py                        # Target-user-first Streamlit web application (Student & Faculty views)
 ├── ml_engine.py                  # Core ML pipeline (16 features, 14,003 records, k=4, 2D PCA, validation)
 ├── recommender.py                # Student-first recommender, habit radar, what-if simulator, & roadmaps
+├── render.yaml                   # Infrastructure-as-code for Render cloud web service deployment
+├── .python-version               # Python version specification (3.11.9)
 ├── requirements.txt              # Production dependency specifications
 └── README.md
 ```
