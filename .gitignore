@@ -24,5 +24,10 @@ desktop.ini
 data/raw/
 
 
-# Office temporary lock files
+# Office & Document files
+*.pptx
+*.ppt
+*.docx
+*.doc
+*.pdf
 ~$*

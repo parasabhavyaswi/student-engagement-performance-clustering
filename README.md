@@ -109,8 +109,6 @@ student-engagement-performance-clustering/
 │   ├── clustering.py             # K-Means++ clustering & 2D PCA projection
 │   ├── validation.py             # Extrinsic validation (Chi2, Cramer's V, NMI, ARI)
 │   └── recommender.py            # Prescriptive 4-week roadmap synthesis engine
-├── templates/
-│   └── presentation_template.pptx# Native master presentation template with university branding
 ├── tests/
 │   └── test_educluster.py        # Automated test suite (12/12 passing)
 ├── app.py                        # Target-user-first Streamlit web application (Student & Faculty views)
@@ -120,10 +118,6 @@ student-engagement-performance-clustering/
 ├── Procfile                      # Process file for Heroku / Render deployment
 ├── render.yaml                   # Render Cloud deployment blueprint
 ├── requirements.txt              # Production dependency specifications
-├── generate_deliverables.py      # Automated generator for IEEE paper & presentation deck
-├── EduCluster_ML_Presentation.pptx# 12-slide executive presentation deck
-├── IEEE_Conference_Template__2_.docx # IEEE two-column research manuscript
-├── IEEE_Conference_Template__2_.pdf  # Publication PDF research manuscript
 └── README.md
 ```
 
@@ -159,14 +153,6 @@ docker build -t educluster-ml .
 # Run the container
 docker run -p 8501:8501 educluster-ml
 ```
-
-### 4. Regenerate Academic Deliverables
-```powershell
-python generate_deliverables.py
-```
-Regenerates:
-- `EduCluster_ML_Presentation.pptx` (12-slide 16:9 widescreen presentation deck preserving template backgrounds)
-- `IEEE_Conference_Template__2_.docx` (Full two-column IEEE formatted research manuscript)
 
 ---
 
