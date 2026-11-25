@@ -12,7 +12,7 @@ from pptx.dml.color import RGBColor
 from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
 from pptx.enum.shapes import MSO_SHAPE
 
-TEMPLATE_PATH = Path(r"C:\Users\ASUS\.gemini\antigravity\brain\bac08d40-ec50-43a2-baa1-2e941ff29026\.user_uploaded\media_1795582472737_2456b9dd.pptx")
+TEMPLATE_PATH = Path("design.pptx") if Path("design.pptx").exists() else Path(r"C:\Users\ASUS\.gemini\antigravity\brain\bac08d40-ec50-43a2-baa1-2e941ff29026\.user_uploaded\media_1795595958270_7f59871c.pptx")
 OUTPUT_PATH = Path("EduCluster_Presentation.pptx")
 FIGURES_DIR = Path("figures")
 SCREENSHOTS_DIR = Path("screenshots")
@@ -34,20 +34,46 @@ COLOR_STEADY = RGBColor(0x25, 0x63, 0xEB)    # #2563EB Steady
 
 
 def add_slide_header(slide, title_text, category_text=None):
-    """Sets standard clean title and subtitle header on slide."""
-    header_box = slide.shapes.add_textbox(Inches(0.92), Inches(0.95), Inches(11.5), Inches(0.85))
+    """Sets the slide's native title placeholder directly so NO 'Click to add title' ghost appears."""
+    try:
+        title_shape = slide.shapes.title
+        if title_shape is not None:
+            title_shape.left = Inches(0.92)
+            title_shape.top = Inches(0.85)
+            title_shape.width = Inches(11.50)
+            title_shape.height = Inches(0.95)
+            tf = title_shape.text_frame
+            tf.word_wrap = True
+            tf.margin_left = tf.margin_top = tf.margin_right = tf.margin_bottom = 0
+
+            p_title = tf.paragraphs[0]
+            p_title.text = title_text
+            p_title.font.name = "Arial"
+            p_title.font.size = Pt(20)
+            p_title.font.bold = True
+            p_title.font.color.rgb = COLOR_NAVY
+            p_title.space_after = Pt(2)
+
+            if category_text:
+                p_sub = tf.add_paragraph()
+                p_sub.text = category_text
+                p_sub.font.name = "Arial"
+                p_sub.font.size = Pt(11)
+                p_sub.font.color.rgb = COLOR_SLATE_MUTED
+            return
+    except Exception:
+        pass
+
+    # Fallback only if no title placeholder exists
+    header_box = slide.shapes.add_textbox(Inches(0.92), Inches(0.85), Inches(11.5), Inches(0.95))
     tf = header_box.text_frame
     tf.word_wrap = True
-    tf.margin_left = tf.margin_top = tf.margin_right = tf.margin_bottom = 0
-
     p_title = tf.paragraphs[0]
     p_title.text = title_text
     p_title.font.name = "Arial"
     p_title.font.size = Pt(20)
     p_title.font.bold = True
     p_title.font.color.rgb = COLOR_NAVY
-    p_title.space_after = Pt(2)
-
     if category_text:
         p_sub = tf.add_paragraph()
         p_sub.text = category_text
@@ -57,30 +83,25 @@ def add_slide_header(slide, title_text, category_text=None):
 
 
 def apply_footer(slide, current_slide: int, total_slides: int = 12):
-    """Fills slide footer and slide number placeholders."""
-    for shape in slide.placeholders:
-        try:
-            if shape.placeholder_format.idx == 11 or "Footer" in shape.name:
-                shape.text = "EduCluster: K-Means Student Engagement & Performance Clustering | Lovely Professional University"
-                if shape.has_text_frame and shape.text_frame.paragraphs:
-                    p = shape.text_frame.paragraphs[0]
-                    p.font.size = Pt(8.5)
-                    p.font.color.rgb = COLOR_SLATE_MUTED
-            elif shape.placeholder_format.idx == 12 or "Slide Number" in shape.name:
-                shape.text = f"{current_slide} / {total_slides}"
-                if shape.has_text_frame and shape.text_frame.paragraphs:
-                    p = shape.text_frame.paragraphs[0]
-                    p.alignment = PP_ALIGN.RIGHT
-                    p.font.size = Pt(8.5)
-                    p.font.color.rgb = COLOR_SLATE_MUTED
-            elif shape.placeholder_format.idx == 10 or "Date" in shape.name:
-                shape.text = "Academic Session 2026"
-                if shape.has_text_frame and shape.text_frame.paragraphs:
-                    p = shape.text_frame.paragraphs[0]
-                    p.font.size = Pt(8.5)
-                    p.font.color.rgb = COLOR_SLATE_MUTED
-        except Exception:
-            pass
+    """Applies clean footer text and slide number to every slide."""
+    footer_box = slide.shapes.add_textbox(Inches(0.92), Inches(6.95), Inches(8.5), Inches(0.35))
+    tf = footer_box.text_frame
+    tf.margin_left = tf.margin_top = tf.margin_right = tf.margin_bottom = 0
+    p = tf.paragraphs[0]
+    p.text = "EduCluster: K-Means Student Engagement & Performance Clustering | Lovely Professional University"
+    p.font.name = "Arial"
+    p.font.size = Pt(8.5)
+    p.font.color.rgb = COLOR_SLATE_MUTED
+
+    num_box = slide.shapes.add_textbox(Inches(9.42), Inches(6.95), Inches(3.0), Inches(0.35))
+    tf_num = num_box.text_frame
+    tf_num.margin_left = tf_num.margin_top = tf_num.margin_right = tf_num.margin_bottom = 0
+    p_num = tf_num.paragraphs[0]
+    p_num.text = f"{current_slide} / {total_slides}"
+    p_num.alignment = PP_ALIGN.RIGHT
+    p_num.font.name = "Arial"
+    p_num.font.size = Pt(8.5)
+    p_num.font.color.rgb = COLOR_SLATE_MUTED
 
 
 def create_card(slide, left, top, width, height, title="", title_color=COLOR_NAVY, bg_color=COLOR_CARD_BG, border_color=COLOR_CARD_BORDER):
@@ -115,79 +136,83 @@ def create_card(slide, left, top, width, height, title="", title_color=COLOR_NAV
 # -----------------------------------------------------------------------------
 
 def build_slide_1(prs):
-    """Slide 1: Title Slide"""
+    """Slide 1: Title Slide with native placeholders and zero ghost boxes."""
     layout = prs.slide_layouts[0]
     slide = prs.slides.add_slide(layout)
-    apply_footer(slide, 1)
 
-    # Gradient-style Navy Title Card
-    hero = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.92), Inches(1.85), Inches(11.5), Inches(4.70))
-    hero.fill.solid()
-    hero.fill.fore_color.rgb = COLOR_NAVY
-    hero.line.color.rgb = COLOR_BLUE
-    hero.line.width = Pt(2)
-
-    tf = hero.text_frame
+    # 1. Native Title Placeholder
+    title_shape = slide.shapes.title
+    title_shape.left = Inches(0.92)
+    title_shape.top = Inches(1.30)
+    title_shape.width = Inches(11.50)
+    title_shape.height = Inches(2.30)
+    tf = title_shape.text_frame
     tf.word_wrap = True
-    tf.margin_left = Inches(0.5)
-    tf.margin_right = Inches(0.5)
-    tf.margin_top = Inches(0.4)
-    tf.margin_bottom = Inches(0.3)
+    tf.margin_left = tf.margin_top = tf.margin_right = tf.margin_bottom = 0
 
-    # Pill Badge
-    p_badge = tf.paragraphs[0]
-    p_badge.text = "⚡ APPLIED MACHINE LEARNING & EDTECH ARCHITECTURE"
-    p_badge.font.name = "Arial"
-    p_badge.font.size = Pt(10)
-    p_badge.font.bold = True
-    p_badge.font.color.rgb = RGBColor(0x93, 0xC5, 0xFD)
-    p_badge.space_after = Pt(8)
+    p0 = tf.paragraphs[0]
+    p0.text = "⚡ APPLIED MACHINE LEARNING & EDUCATIONAL DATA MINING"
+    p0.font.name = "Arial"
+    p0.font.size = Pt(11)
+    p0.font.bold = True
+    p0.font.color.rgb = COLOR_BLUE
+    p0.space_after = Pt(6)
 
-    # Title
-    p_title = tf.add_paragraph()
-    p_title.text = "K-Means Clustering of Student Engagement & Performance Data for Personalized Learning Path Design"
-    p_title.font.name = "Arial"
-    p_title.font.size = Pt(23)
-    p_title.font.bold = True
-    p_title.font.color.rgb = COLOR_WHITE
-    p_title.space_after = Pt(8)
+    p1 = tf.add_paragraph()
+    p1.text = "K-Means Clustering of Student Engagement & Performance Data for Personalized Learning Path Design"
+    p1.font.name = "Arial"
+    p1.font.size = Pt(22)
+    p1.font.bold = True
+    p1.font.color.rgb = COLOR_NAVY
+    p1.space_after = Pt(6)
 
-    # Subtitle
-    p_sub = tf.add_paragraph()
-    p_sub.text = "Project EduCluster: An Unsupervised Behavioral Segmentation & Actionable Counterfactual Pacing Engine"
-    p_sub.font.name = "Arial"
-    p_sub.font.size = Pt(13)
-    p_sub.font.color.rgb = RGBColor(0xE2, 0xE8, 0xF0)
-    p_sub.space_after = Pt(20)
+    p2 = tf.add_paragraph()
+    p2.text = "Project EduCluster: Unsupervised Behavioral Persona Discovery, Extrinsic Outcome Validation & 4-Week Pedagogical Roadmaps"
+    p2.font.name = "Arial"
+    p2.font.size = Pt(12)
+    p2.font.color.rgb = COLOR_SLATE_MUTED
 
-    # Horizontal divider
-    p_div = tf.add_paragraph()
-    p_div.text = "____________________________________________________________________________________"
-    p_div.font.size = Pt(8)
-    p_div.font.color.rgb = RGBColor(0x3B, 0x82, 0xF6)
-    p_div.space_after = Pt(14)
+    # 2. Native Subtitle Placeholder
+    sub_shape = slide.placeholders[1]
+    sub_shape.left = Inches(0.92)
+    sub_shape.top = Inches(3.75)
+    sub_shape.width = Inches(11.50)
+    sub_shape.height = Inches(1.10)
+    tf_sub = sub_shape.text_frame
+    tf_sub.word_wrap = True
+    tf_sub.margin_left = tf_sub.margin_top = tf_sub.margin_right = tf_sub.margin_bottom = 0
 
-    # Author Metadata Box
-    p_meta1 = tf.add_paragraph()
-    p_meta1.text = "Author: Parasa Bhavyaswi (Reg. No: 12109876)  |  Bachelor of Technology in Computer Science & Engineering"
-    p_meta1.font.name = "Arial"
-    p_meta1.font.size = Pt(11.5)
-    p_meta1.font.bold = True
-    p_meta1.font.color.rgb = COLOR_WHITE
-    p_meta1.space_after = Pt(4)
+    p_sub0 = tf_sub.paragraphs[0]
+    p_sub0.text = "Candidate: Parasa Bhavyaswi (Reg. No.: 12502256)   |   Supervisor: Dr. Bhupinder Singh, Professor"
+    p_sub0.font.name = "Arial"
+    p_sub0.font.size = Pt(13)
+    p_sub0.font.bold = True
+    p_sub0.font.color.rgb = COLOR_SLATE_DARK
+    p_sub0.space_after = Pt(4)
 
-    p_meta2 = tf.add_paragraph()
-    p_meta2.text = "Research Supervisor: Dr. Bhupinder Singh (Associate Professor, CSE)"
-    p_meta2.font.name = "Arial"
-    p_meta2.font.size = Pt(11)
-    p_meta2.font.color.rgb = RGBColor(0xBA, 0xE6, 0xFD)
-    p_meta2.space_after = Pt(4)
+    p_sub1 = tf_sub.add_paragraph()
+    p_sub1.text = "School of Computer Science & Engineering, Lovely Professional University, Phagwara, Punjab, India"
+    p_sub1.font.name = "Arial"
+    p_sub1.font.size = Pt(11)
+    p_sub1.font.color.rgb = COLOR_SLATE_MUTED
 
-    p_meta3 = tf.add_paragraph()
-    p_meta3.text = "Department: School of Computer Science & Engineering  •  Lovely Professional University, Punjab, India"
-    p_meta3.font.name = "Arial"
-    p_meta3.font.size = Pt(10.5)
-    p_meta3.font.color.rgb = RGBColor(0x94, 0xA3, 0xB8)
+    # 3. Highlighted Metrics Card
+    c_card = create_card(slide, Inches(0.92), Inches(4.95), Inches(11.50), Inches(1.80), "Core Quantitative Project Invariants & Verified Benchmarks", COLOR_NAVY, RGBColor(0xF0, 0xF9, 0xFF), RGBColor(0xBA, 0xE6, 0xFD))
+    tf_c = c_card.text_frame
+    metrics = [
+        ("OULAD Dataset Scale:", "N = 14,003 valid student-module enrolments across 16 non-leaking features across 3 behavioral pillars."),
+        ("Unsupervised Segmentation:", "Optimal k = 4 (Silhouette = 0.4272); 2D PCA captures 88.3% cumulative variance (PC1 = 80.7%, PC2 = 7.5%)."),
+        ("Extrinsic Teacher Validation:", "Decisive non-random alignment against final course results: χ² = 11,833.21 (p < 0.0001, df = 9), Cramér's V = 0.5307, NMI = 0.3172.")
+    ]
+    for m_title, m_desc in metrics:
+        p = tf_c.add_paragraph()
+        p.text = f"• {m_title} {m_desc}"
+        p.font.name = "Arial"
+        p.font.size = Pt(9.5)
+        p.font.color.rgb = COLOR_SLATE_DARK
+        p.space_after = Pt(3)
+
+    apply_footer(slide, 1)
 
 
 def build_slide_2(prs):
