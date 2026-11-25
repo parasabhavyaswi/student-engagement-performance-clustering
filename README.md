@@ -20,8 +20,11 @@
 | **Streamlit Community Cloud** | **[student-engagement-performance-clustering.streamlit.app](https://student-engagement-performance-clustering.streamlit.app)** | Permanent Streamlit Cloud deployment target |
 | **GitHub Repository** | **[parasabhavyaswi/student-engagement-performance-clustering](https://github.com/parasabhavyaswi/student-engagement-performance-clustering)** | Source code, models, datasets, tests, and deliverables |
 | **Local Deployment** | `http://localhost:8501` | Run locally via `streamlit run app.py` |
-| **IEEE Conference Paper** | `EduCluster_IEEE_Paper.docx` | Publication-ready 7-page IEEE manuscript with 20 citations |
-| **Project Presentation** | `EduCluster_Presentation.pptx` | 12-slide technical presentation deck with 300 DPI figures |
+| **IEEE Conference Paper (PDF)** | **[EduCluster_IEEE_Paper.pdf](EduCluster_IEEE_Paper.pdf)** | Camera-ready 6-page IEEE conference paper (PDF) |
+| **IEEE Conference Paper (DOCX)** | **[EduCluster_IEEE_Paper.docx](EduCluster_IEEE_Paper.docx)** | Publication-ready 7-page IEEE manuscript (Word DOCX) |
+| **Project Presentation** | **[EduCluster_Presentation.pptx](EduCluster_Presentation.pptx)** | 12-slide technical presentation deck with 300 DPI figures |
+| **Publication Figures** | **[figures/](figures/)** | High-resolution 300 DPI figures (Figs 1–4) |
+| **Dashboard Screenshots** | **[screenshots/](screenshots/)** | Deployed application UI telemetry screenshots |
 
 ---
 
@@ -114,7 +117,8 @@ student-engagement-performance-clustering/
 │   └── test_educluster.py        # Automated test suite (12/12 passing)
 ├── figures/                      # High-resolution (300 DPI) publication figures (fig1-fig4)
 ├── screenshots/                  # High-resolution UI screenshots of the deployed dashboard
-├── EduCluster_IEEE_Paper.docx    # Publication-ready IEEE conference research paper (7 pages, 20 refs)
+├── EduCluster_IEEE_Paper.pdf     # Camera-ready IEEE conference research paper (6 pages, PDF)
+├── EduCluster_IEEE_Paper.docx    # Publication-ready IEEE conference research paper (7 pages, 20 refs, Word)
 ├── EduCluster_Presentation.pptx  # 12-slide technical presentation deck (cloned from slide master)
 ├── build_ieee_paper.py           # Automated IEEE paper generator (python-docx)
 ├── build_presentation.py         # Automated presentation deck generator (python-pptx)
