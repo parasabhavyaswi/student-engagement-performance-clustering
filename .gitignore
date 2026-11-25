@@ -31,3 +31,7 @@ data/raw/
 *.doc
 *.pdf
 ~$*
+
+# Allow official deliverables
+!EduCluster_Presentation.pptx
+!EduCluster_IEEE_Paper.docx
