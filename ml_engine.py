@@ -124,10 +124,12 @@ def load_or_generate_oulad_data() -> pd.DataFrame:
     """
     # 1. Search candidate paths
     candidate_paths = [
+        PROJECT_ROOT / "data" / "processed" / "oulad_features_14003.csv",
         PROJECT_ROOT / "data" / "raw" / "oulad_features_14003.csv",
-        PROJECT_ROOT / "data" / "processed" / "oulad_features_processed.csv",
-        PROJECT_ROOT / "data" / "processed" / "oulad_clustered_enrolments.csv",
+        Path.cwd() / "data" / "processed" / "oulad_features_14003.csv",
         Path.cwd() / "data" / "raw" / "oulad_features_14003.csv",
+        PROJECT_ROOT / "data" / "processed" / "oulad_clustered_enrolments.csv",
+        PROJECT_ROOT / "data" / "processed" / "oulad_features_processed.csv",
     ]
 
     for p in candidate_paths:
@@ -136,8 +138,10 @@ def load_or_generate_oulad_data() -> pd.DataFrame:
                 df = pd.read_csv(p)
                 # Verify features exist
                 if all(col in df.columns for col in ALL_16_FEATURES):
-                    if len(df) == 14003 or "final_result" in df.columns:
-                        return df
+                    # Ensure zero nulls in feature matrix
+                    if df[ALL_16_FEATURES].isnull().sum().sum() == 0:
+                        if len(df) == 14003 or "final_result" in df.columns:
+                            return df
             except Exception:
                 continue
 
@@ -257,8 +261,15 @@ class EduClusterPipeline:
             df = load_or_generate_oulad_data()
         self.df = df.copy()
 
-        # 1. Transform features with log1p on skewed click distributions
+        # 0. Defensive data hygiene: impute any missing values and sanitize infs
         X = self.df[ALL_16_FEATURES].copy()
+        for col in ALL_16_FEATURES:
+            if X[col].isnull().any():
+                col_median = X[col].median()
+                X[col] = X[col].fillna(col_median if not np.isnan(col_median) else 0.0)
+        X = X.replace([np.inf, -np.inf], 0.0)
+
+        # 1. Transform features with log1p on skewed click distributions
         for col in LOG_TRANSFORM_COLS:
             X[col] = np.log1p(np.maximum(0, X[col]))
 
