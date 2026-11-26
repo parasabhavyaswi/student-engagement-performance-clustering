@@ -84,12 +84,14 @@ student-engagement-performance-clustering/
 ├── app.py
 ├── ml_engine.py
 ├── recommender.py
+├── generate_figures.py
 ├── requirements.txt
 ├── REPORT.docx
-├── data/processed/
+├── design.pptx
+├── EduCluster_Presentation_Dark.pptx
+├── data/
 ├── figures/
 ├── models/
-├── reports/
 ├── screenshots/
 ├── src/
 │   ├── __init__.py
