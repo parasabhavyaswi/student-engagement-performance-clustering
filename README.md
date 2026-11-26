@@ -38,7 +38,8 @@ Final course outcomes (`Distinction`, `Pass`, `Fail`, `Withdrawn`) were excluded
 | :--- | :--- | :--- |
 | **Live Streamlit App** | [student-engagement-performance-clustering.streamlit.app](https://student-engagement-performance-clustering.streamlit.app/) | Interactive Student Self-Check, 4-Week Plan & Cohort Hub |
 | **GitHub Repo** | [parasabhavyaswi/student-engagement-performance-clustering](https://github.com/parasabhavyaswi/student-engagement-performance-clustering) | Code, saved model artifacts, tests, and scripts |
-| **Project Presentation** | [EduCluster_Presentation_Dark.pptx](EduCluster_Presentation_Dark.pptx) | Sleek dark-navy 16:9 presentation deck (design master theme) |
+| **Project Presentation (Master Template)** | [design.pptx](design.pptx) | Official LPU 16:9 widescreen academic presentation deck built on university slide master |
+| **Project Presentation (Dark Copy)** | [EduCluster_Presentation_Dark.pptx](EduCluster_Presentation_Dark.pptx) | Synchronized presentation copy built on official university template |
 | **Project Report** | [REPORT.docx](REPORT.docx) | 7-Page IEEE Transactions formatted manuscript |
 | **Figures & Captures** | [figures/](figures/) & [screenshots/](screenshots/) | 300 DPI dark & light figures and UI captures |
 
