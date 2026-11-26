@@ -1,7 +1,6 @@
 # EduCluster: Student Engagement & Performance Clustering
 
 [![Live Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://student-engagement-performance-clustering.streamlit.app/)
-[![Render Deployment](https://img.shields.io/badge/Render-Live%20Demo-46E3B7?logo=render&logoColor=white)](https://student-engagement-performance-clustering.onrender.com)
 [![GitHub Repository](https://img.shields.io/badge/GitHub-student--engagement--performance--clustering-181717?logo=github)](https://github.com/parasabhavyaswi/student-engagement-performance-clustering)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
@@ -14,9 +13,8 @@
 
 ## 🚀 Live Cloud Deployment
 
-Access the live interactive **Student Learning Intelligence Portal** here:
-- **Primary Live App (Streamlit Cloud):** [https://student-engagement-performance-clustering.streamlit.app/](https://student-engagement-performance-clustering.streamlit.app/)
-- **Alternative Web Service (Render):** [https://student-engagement-performance-clustering.onrender.com/](https://student-engagement-performance-clustering.onrender.com/)
+Access the live interactive **Student Learning Intelligence Portal** hosted on Streamlit Community Cloud:
+- **Official Live Application:** [https://student-engagement-performance-clustering.streamlit.app/](https://student-engagement-performance-clustering.streamlit.app/)
 - **Local Dev Server:** `streamlit run app.py` (accessible at `http://localhost:8501`)
 
 ---
@@ -39,11 +37,9 @@ Final course outcomes (`Distinction`, `Pass`, `Fail`, `Withdrawn`) were excluded
 | Resource | Location / Link | Notes |
 | :--- | :--- | :--- |
 | **Live Streamlit App** | [student-engagement-performance-clustering.streamlit.app](https://student-engagement-performance-clustering.streamlit.app/) | Interactive Student Self-Check, 4-Week Plan & Cohort Hub |
-| **Cloud Web Service** | [student-engagement-performance-clustering.onrender.com](https://student-engagement-performance-clustering.onrender.com/) | Live cloud web service |
 | **GitHub Repo** | [parasabhavyaswi/student-engagement-performance-clustering](https://github.com/parasabhavyaswi/student-engagement-performance-clustering) | Code, saved model artifacts, tests, and scripts |
 | **Project Presentation** | [EduCluster_Presentation_Dark.pptx](EduCluster_Presentation_Dark.pptx) | Sleek dark-navy 16:9 presentation deck (design master theme) |
 | **Project Report** | [REPORT.docx](REPORT.docx) | 7-Page IEEE Transactions formatted manuscript |
-| **Render Config** | [render.yaml](render.yaml) | Deployment configuration for Render hosting |
 | **Figures & Captures** | [figures/](figures/) & [screenshots/](screenshots/) | 300 DPI dark & light figures and UI captures |
 
 ---
@@ -83,7 +79,6 @@ student-engagement-performance-clustering/
 ├── app.py
 ├── ml_engine.py
 ├── recommender.py
-├── render.yaml
 ├── requirements.txt
 ├── REPORT.docx
 ├── data/processed/

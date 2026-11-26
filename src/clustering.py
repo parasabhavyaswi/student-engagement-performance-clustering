@@ -10,7 +10,7 @@ Executes hyperparameter validation sweeps (k = 2..8) computing:
 - Davies-Bouldin Index
 - Calinski-Harabasz Score
 
-Fits optimal KMeans(n_clusters=4, init='k-means++', n_init=20, random_state=42)
+Fits optimal KMeans(n_clusters=4, init='random', n_init=20, random_state=42)
 with deterministic cluster re-indexing in descending order of weighted_avg_score:
 - Cluster 0: High-Achieving Self-Directed (22.1% / n = 3,100)
 - Cluster 1: Steady & Consistent Learners (37.7% / n = 5,280)
@@ -149,7 +149,7 @@ def evaluate_k_sweep(
                 "selected": (k == 4)
             })
         else:
-            km = KMeans(n_clusters=k, init="k-means++", n_init=10, random_state=random_state)
+            km = KMeans(n_clusters=k, init="random", n_init=10, random_state=random_state)
             preds = km.fit_predict(X_scaled)
             results.append({
                 "k": k,
@@ -176,7 +176,7 @@ def fit_kmeans_pipeline(
     - cluster_labels: np.ndarray of cluster assignments (0..3)
     - df_clustered: DataFrame with 'cluster' and 'cluster_name' columns added
     """
-    km_initial = KMeans(n_clusters=n_clusters, init="k-means++", n_init=20, random_state=random_state)
+    km_initial = KMeans(n_clusters=n_clusters, init="random", n_init=20, random_state=random_state)
     initial_labels = km_initial.fit_predict(X_scaled)
 
     # Determine cluster ordering by descending weighted_avg_score
