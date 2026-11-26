@@ -1,6 +1,10 @@
 # EduCluster: Student Engagement & Performance Clustering
 
-[![Live Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://student-engagement-performance-clustering.streamlit.app/)
+> ### 🚀 **LIVE CLOUD APPLICATION DEPLOYMENT**
+> 🔗 **Direct Web App Link:** **[https://student-engagement-performance-clustering.streamlit.app/](https://student-engagement-performance-clustering.streamlit.app/)**  
+> 🌟 *Click the link above or the Streamlit badge below to launch the live interactive Student Learning Intelligence Portal.*
+
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://student-engagement-performance-clustering.streamlit.app/)
 [![GitHub Repository](https://img.shields.io/badge/GitHub-student--engagement--performance--clustering-181717?logo=github)](https://github.com/parasabhavyaswi/student-engagement-performance-clustering)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
