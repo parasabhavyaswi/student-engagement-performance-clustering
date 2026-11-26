@@ -35,5 +35,4 @@ data/raw/
 # Allow official project report and presentation
 !REPORT.docx
 !report.docx
-!EduCluster_Presentation_Final.pptx
 !EduCluster_Presentation_Dark.pptx

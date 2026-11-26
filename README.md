@@ -41,7 +41,7 @@ Final course outcomes (`Distinction`, `Pass`, `Fail`, `Withdrawn`) were excluded
 | **Live Streamlit App** | [student-engagement-performance-clustering.streamlit.app](https://student-engagement-performance-clustering.streamlit.app/) | Interactive Student Self-Check, 4-Week Plan & Cohort Hub |
 | **Cloud Web Service** | [student-engagement-performance-clustering.onrender.com](https://student-engagement-performance-clustering.onrender.com/) | Live cloud web service |
 | **GitHub Repo** | [parasabhavyaswi/student-engagement-performance-clustering](https://github.com/parasabhavyaswi/student-engagement-performance-clustering) | Code, saved model artifacts, tests, and scripts |
-| **Project Presentation** | [EduCluster_Presentation_Final.pptx](EduCluster_Presentation_Final.pptx) / [Dark PPT](EduCluster_Presentation_Dark.pptx) | Sleek dark-navy 16:9 presentation deck |
+| **Project Presentation** | [EduCluster_Presentation_Dark.pptx](EduCluster_Presentation_Dark.pptx) | Sleek dark-navy 16:9 presentation deck (design master theme) |
 | **Project Report** | [REPORT.docx](REPORT.docx) | 7-Page IEEE Transactions formatted manuscript |
 | **Render Config** | [render.yaml](render.yaml) | Deployment configuration for Render hosting |
 | **Figures & Captures** | [figures/](figures/) & [screenshots/](screenshots/) | 300 DPI dark & light figures and UI captures |
