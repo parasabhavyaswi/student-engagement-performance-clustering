@@ -32,6 +32,7 @@ data/raw/
 *.pdf
 ~$*
 
-# Allow official project report
+# Allow official project report and presentation
 !REPORT.docx
 !report.docx
+!EduCluster_Presentation_Final.pptx
