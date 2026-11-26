@@ -1,5 +1,7 @@
 # EduCluster: Student Engagement & Performance Clustering
 
+[![Live Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://student-engagement-performance-clustering.streamlit.app/)
+[![Render Deployment](https://img.shields.io/badge/Render-Live%20Demo-46E3B7?logo=render&logoColor=white)](https://student-engagement-performance-clustering.onrender.com)
 [![GitHub Repository](https://img.shields.io/badge/GitHub-student--engagement--performance--clustering-181717?logo=github)](https://github.com/parasabhavyaswi/student-engagement-performance-clustering)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
@@ -7,6 +9,15 @@
 **Author:** Parasa Bhavyaswi (Reg. No.: 12502256)  
 **Guide:** Dr. Bhupinder Singh, Professor  
 **Affiliation:** School of Computer Science & Engineering, Lovely Professional University, Phagwara, Punjab, India  
+
+---
+
+## 🚀 Live Cloud Deployment
+
+Access the live interactive **Student Learning Intelligence Portal** here:
+- **Primary Live App (Streamlit Cloud):** [https://student-engagement-performance-clustering.streamlit.app/](https://student-engagement-performance-clustering.streamlit.app/)
+- **Alternative Web Service (Render):** [https://student-engagement-performance-clustering.onrender.com/](https://student-engagement-performance-clustering.onrender.com/)
+- **Local Dev Server:** `streamlit run app.py` (accessible at `http://localhost:8501`)
 
 ---
 
@@ -27,18 +38,20 @@ Final course outcomes (`Distinction`, `Pass`, `Fail`, `Withdrawn`) were excluded
 
 | Resource | Location / Link | Notes |
 | :--- | :--- | :--- |
+| **Live Streamlit App** | [student-engagement-performance-clustering.streamlit.app](https://student-engagement-performance-clustering.streamlit.app/) | Interactive Student Self-Check, 4-Week Plan & Cohort Hub |
+| **Cloud Web Service** | [student-engagement-performance-clustering.onrender.com](https://student-engagement-performance-clustering.onrender.com/) | Live cloud web service |
 | **GitHub Repo** | [parasabhavyaswi/student-engagement-performance-clustering](https://github.com/parasabhavyaswi/student-engagement-performance-clustering) | Code, saved model artifacts, tests, and scripts |
-| **Streamlit Portal** | `http://localhost:8501` (or live cloud URL once deployed) | Interactive Student Self-Check, 4-Week Plan & Cohort Hub |
+| **Project Presentation** | [EduCluster_Presentation_Final.pptx](EduCluster_Presentation_Final.pptx) / [Dark PPT](EduCluster_Presentation_Dark.pptx) | Sleek dark-navy 16:9 presentation deck |
+| **Project Report** | [REPORT.docx](REPORT.docx) | 7-Page IEEE Transactions formatted manuscript |
 | **Render Config** | [render.yaml](render.yaml) | Deployment configuration for Render hosting |
-| **Project Report** | [REPORT.docx](REPORT.docx) | Project documentation and academic report |
-| **Figures & Captures** | [figures/](figures/) & [screenshots/](screenshots/) | 300 DPI charts and portal screenshots |
+| **Figures & Captures** | [figures/](figures/) & [screenshots/](screenshots/) | 300 DPI dark & light figures and UI captures |
 
 ---
 
 ## Pipeline & Methodology
 
 1. **Data Preparation (`ml_engine.py` / `src/preprocess.py`):** Joins OULAD tables (`studentInfo`, `studentVle`, `studentAssessment`, `assessments`) across seven STEM modules (`N = 14,003`), removes banked transfers (`is_banked = 1`), fills missing early diagnostic values with cohort medians, caps extreme outliers at `Q3 + 3.0 × IQR`, compresses skewed click counts with `log1p`, and standardizes with `StandardScaler`.
-2. **Clustering (`src/clustering.py`):** Evaluates `k` from `2` to `8` using `k-means++`. `k = 4` gives the peak mean Silhouette score (**0.4272**) and an inertia elbow at **112,450** (`Calinski-Harabasz = 4,892.4`, `Davies-Bouldin = 0.984`). The top two PCA components account for **88.3%** of total variance (`PC1 = 80.7%`, `PC2 = 7.5%`).
+2. **Clustering (`src/clustering.py`):** Evaluates `k` from `2` to `8` using Standard K-Means. `k = 4` gives the peak mean Silhouette score (**0.4272**) and an inertia elbow at **112,450** (`Calinski-Harabasz = 4,892.4`, `Davies-Bouldin = 0.984`). The top two PCA components account for **88.3%** of total variance (`PC1 = 80.7%`, `PC2 = 7.5%`).
 3. **Recommendations & Validation (`recommender.py` / `src/validation.py`):** Computes distance from student inputs to persona centroids, targets the student's lowest habits across a 4-week plan, and compares cluster assignments post-hoc against held-out teacher outcomes.
 
 ---
