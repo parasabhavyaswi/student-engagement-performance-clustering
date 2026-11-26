@@ -31,3 +31,7 @@ data/raw/
 *.doc
 *.pdf
 ~$*
+
+# Allow official project report
+!REPORT.docx
+!report.docx
